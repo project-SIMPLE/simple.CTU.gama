@@ -2,21 +2,53 @@ model LoadSubsi
 
 global {
 	shape_file MKD_WGS84_shape_file <- shape_file("../includes/AdminBound/MKD_WGS84.shp");
-	string scenario <- "B1/B1_";
-	//	string scenarioM<-"M1/M1_";
+	string scenarioB <- "B1/B1_";
+	string scenarioM<-"M1/M1_";
 	int _year <- 2018;
 	file dem_file <- grid_file("../includes/DEM/dem_500x500_align.tif");
+	field diffB1_M1_file <-field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
+	int previousScenariosSubsidence <- 1;
+//	int currentScenariosSubsidence <- 1;
+//  ca be use matrix or field 
+	//matrix<float> flooding <- field(dem_file);
 	field flooding <- field(dem_file);
 	field DEM <- field(dem_file);
-	field allField <- field(grid_file("../includes/Cum_subsidence/" + scenario + _year + ".tif"));
+	field allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
+//	matrix<float> flooding <- field(dem_file);
+//	matrix<float> DEM <- field(dem_file);
+//	matrix<float> allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
 	geometry shape <- envelope(dem_file);
-
+	float water_consummation_rate <-0.03;
+	float SLR_level <- 0.15 ; // Scenario SLR 15 cm
+	init {
+		
+		 
+	}
 	reflex load {
+		water_consummation_rate <- rnd(0.4);
+		write water_consummation_rate;
 //		if (cycle < (2099 - _year)) {
 			_year <- (_year + 1) > 2099 ? 2018 : (_year + 1);
-			allField <- field(grid_file("../includes/Cum_subsidence/" + scenario + _year + ".tif"));
-//		}
-  flooding  <- DEM  - allField  - 0.015; 
+			//allField <- field(grid_file("../includes/Cum_subsidence/" + scenario + _year + ".tif"));
+//		}/
+   // select subsidence scenarios based on water consummation. 
+		if water_consummation_rate <0.02 {
+			allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioM + _year + ".tif"));
+			
+		}
+		else{ if water_consummation_rate > 0.02{
+					allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
+						
+			}
+		} 
+//calculate elevation of flooding level. <0 means flooded		
+  		//flooding  <- DEM  - allField  - SLR_level; 
+  		loop cell_temp over: flooding cells_in shape  {
+				if flooding[geometry(cell_temp).location] > -9999.0{
+					flooding[geometry(cell_temp).location]<- DEM[geometry(cell_temp).location]-allField[geometry(cell_temp).location]-0.15;
+				}
+			}
+			
 
 		//		loop cell_temp over: cell_dem  {
 		//			if (DEM[geometry(cell_temp).location]> -9999) and (allField[geometry(cell_temp).location]< 3.40282e+38){
@@ -24,6 +56,14 @@ global {
 		//				
 		//			}
 		//		}
+		//write flooding[250,250];
+//		write '';
+//		write flooding;
+//		write "=====";
+//		write DEM;
+//		
+		 //save flooding to:"../results/flooding.asc" format:"asc" crs:"EPSG:32846";
+		 save flooding to:"../results/flooding_tif.tif" format:"geotiff" crs:"EPSG:32846";
 	}
 
 	init {
@@ -40,16 +80,27 @@ species boundMK {
 }
 
 experiment main type: gui {
+	list<rgb> flood_color <- palette([#white,#blue]);
+
+	list<rgb> depth_color <- palette([#white, #red,#blue]);
+	
 	output {
-		display "Cumulative subsidence" type: 3d {
-			mesh allField scale: -10000 grayscale: true no_data: 3.40282e+38;
+		display "DEM" type: 3d {
+			//mesh allField scale: -10000 grayscale: true no_data: 3.40282e+38;
+			mesh DEM color:depth_color no_data: -9999.0 smooth: false;
 		}
-
-		display "Flooding-SLR 15cm" type: 3d {
+		display "Flooding Subsidence SLR 15cm" type: 3d {
 			species boundMK;
-			mesh DEM color: scale([#darkblue::-10, #blue::-3, #lightblue::-1, #cyan::-0.001, #red::1, #darkred::2, #black::30]) no_data: -9999 smooth: false;
+			//mesh flooding color:scale([#red::1, #yellow::2, #green::3, #blue::6]) no_data: -9999 smooth: false;
+			mesh flooding color:flood_color no_data: -9999 smooth: false; 
+			//scale([#grey::-100,#darkblue::-10, #blue::-3, #cyan::-1, #lightblue::-0.001, #red::1, #darkred::2, #black::30]) no_data: -9999 smooth: false;
 		}
+		display "Flooding Subsidence SLR 15cm old way " type: 3d {
+			species boundMK;
+			///mesh flooding color:scale([#red::1, #orange::5,  #blue::6]) no_data: -9999 smooth: false;
+			mesh flooding color:flood_color no_data: -9999.0 smooth: false; 
 
+		}
 	}
 
 }
