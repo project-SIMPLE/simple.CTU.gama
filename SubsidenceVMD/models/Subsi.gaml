@@ -36,14 +36,16 @@ global {
 					allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
 			
 		} 
-//calculate elevation of flooding level. <0 means flooded		
-  		//flooding  <- DEM  - allField  - SLR_level; 
+//calculate elevation of flooding level. <0 means flooded
+		field tmpField <- copy(DEM);		
+  		//flooding  <- tmpField  - allField  - SLR_level;  // ko duoc vi no-data bị tính luôn 
   		loop cell_temp over: flooding cells_in shape  {
-				if flooding[geometry(cell_temp).location] > -9999.0{
-					flooding[geometry(cell_temp).location]<- DEM[geometry(cell_temp).location]-allField[geometry(cell_temp).location]-0.15;
+				if flooding[geometry(cell_temp).location] != -9999.0{
+  				write flooding[geometry(cell_temp).location];
+					flooding[geometry(cell_temp).location]<- tmpField[geometry(cell_temp).location]-allField[geometry(cell_temp).location]-0.15;
 				}
 			}
-		
+//		
 		 save flooding to:"../results/flooding_tif.tif" format:"geotiff" crs:"EPSG:32846";
 	}
 
@@ -73,7 +75,7 @@ experiment main type: gui {
 		display "Flooding Subsidence SLR 15cm" type: 3d {
 			species boundMK;
 			//mesh flooding color:scale([#red::1, #yellow::2, #green::3, #blue::6]) no_data: -9999 smooth: false;
-			mesh flooding color:flood_color no_data: -9999 smooth: false; 
+			mesh flooding color:flood_color no_data: -9999.0 smooth: false; 
 			//scale([#grey::-100,#darkblue::-10, #blue::-3, #cyan::-1, #lightblue::-0.001, #red::1, #darkred::2, #black::30]) no_data: -9999 smooth: false;
 		}
 		display "Flooding Subsidence SLR 15cm old way " type: 3d {
