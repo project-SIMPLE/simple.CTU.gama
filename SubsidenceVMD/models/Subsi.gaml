@@ -14,9 +14,6 @@ global {
 	field flooding <- field(dem_file);
 	field DEM <- field(dem_file);
 	field allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
-//	matrix<float> flooding <- field(dem_file);
-//	matrix<float> DEM <- field(dem_file);
-//	matrix<float> allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
 	geometry shape <- envelope(dem_file);
 	float water_consummation_rate <-0.03;
 	float SLR_level <- 0.15 ; // Scenario SLR 15 cm
@@ -27,19 +24,17 @@ global {
 	reflex load {
 		water_consummation_rate <- rnd(0.4);
 		write water_consummation_rate;
-//		if (cycle < (2099 - _year)) {
+		if (cycle < (2099 - _year)) {
 			_year <- (_year + 1) > 2099 ? 2018 : (_year + 1);
-			//allField <- field(grid_file("../includes/Cum_subsidence/" + scenario + _year + ".tif"));
-//		}/
+		}
    // select subsidence scenarios based on water consummation. 
 		if water_consummation_rate <0.02 {
 			allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioM + _year + ".tif"));
 			
 		}
-		else{ if water_consummation_rate > 0.02{
+		else{ 
 					allField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
-						
-			}
+			
 		} 
 //calculate elevation of flooding level. <0 means flooded		
   		//flooding  <- DEM  - allField  - SLR_level; 
@@ -48,21 +43,7 @@ global {
 					flooding[geometry(cell_temp).location]<- DEM[geometry(cell_temp).location]-allField[geometry(cell_temp).location]-0.15;
 				}
 			}
-			
-
-		//		loop cell_temp over: cell_dem  {
-		//			if (DEM[geometry(cell_temp).location]> -9999) and (allField[geometry(cell_temp).location]< 3.40282e+38){
-		//				cell_temp.grid_value <- cell_temp.elevation- allField[geometry(cell_temp).location] - 0.015;
-		//				
-		//			}
-		//		}
-		//write flooding[250,250];
-//		write '';
-//		write flooding;
-//		write "=====";
-//		write DEM;
-//		
-		 //save flooding to:"../results/flooding.asc" format:"asc" crs:"EPSG:32846";
+		
 		 save flooding to:"../results/flooding_tif.tif" format:"geotiff" crs:"EPSG:32846";
 	}
 
