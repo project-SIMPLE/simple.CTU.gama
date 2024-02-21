@@ -10,7 +10,10 @@ import "entities/farming_unit.gaml"
 import "functions.gaml"
 import "Subsi.gaml"
 global {
+	//Data list - sent by GamePlay
 	json_file JsonFile <- json_file("../includes/ExchangeGameplay/_lstLU_decisionJSon.json");
+	// export suggestion to Game play
+	//json_file JsonFileExportVR <- json_file("../includes/ExchangeGameplay/_suggestGamePlay.json");
 	map<string, unknown> VR_json <- JsonFile.contents;
 	list<map<string, float>> VR_decision ;
 	float total_wu2018 <-0.0;
@@ -29,6 +32,7 @@ global {
 		total_wu2018 <- calWater_unit();
 		
 	} 
+	// calculate total water unit of the data
 	float calWater_unit{
 		float tmpWu<-0.0;
 		ask active_cell {
@@ -63,13 +67,19 @@ global {
 	            }            	
             }
         }
-       total_wu <- calWater_unit();
-       write "Water unit 2018:"+total_wu2018;
+       
+	}
+	reflex sent_Suggestion_gameplay{
+		total_wu <- calWater_unit();
+       	write "Water unit 2018:"+total_wu2018;
         write "water unit:" + total_wu;
         if (total_wu2018!= 0.0){
         	water_consummation_rate<-(total_wu-total_wu2018)/total_wu2018;
-        	write "water comps rate in read GP:"+water_consummation_rate;
+        	write "water comps rate in read GP:"+water_consummation_rate;        	
         }
+        string sSuggestion <- "{\"information\": [{\"waterunit\": 15.6},{\"total_profit\": 15000.0}]}";
+        map pp<-["waterunit":: 15.6];
+		save to_json(pp) to: "../includes/ExchangeGameplay/_infoGamePlay.json" format:"text" rewrite: true;//includes/ExchangeGameplay/_suggestGamePlay.json");
 	}
 } 
 
@@ -84,7 +94,9 @@ experiment "Landuse_Simple"   {
 	
 	output {
 		display LU_sim type: opengl axes: false {
+			
 			mesh farming_unit color: scale(lu_color) smooth: false;
+			species boundMK aspect:base;
 		}
 		display "Digital Elevation Model" type: 3d {
 			mesh DEM color:depth_color scale:1000 no_data: -9999.0 smooth:true triangulation:false;

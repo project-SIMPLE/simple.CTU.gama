@@ -55,7 +55,7 @@ global {
 		s <- (s replace ("][", ",") replace ("[", "") replace ("]", ""));
 		write s;
 		if (int(world) = 0) {
-			save s to: "../results/" + explo_param + "_" + subsidence_threshold + "_debt.csv" type: text rewrite: true;
+			save s to: "../results/" + explo_param + "_" + subsidence_threshold + "_debt.csv" format: "text" rewrite: true;
 		}
 
 		s <- "";
@@ -68,10 +68,10 @@ global {
 		s <- (s replace ("][", ",") replace ("[", "") replace ("]", ""));
 		write s;
 		if (int(world) = 0) {
-			save s to: "../results/" + explo_param + "_" + subsidence_threshold + "_benefit.csv" type: text rewrite: true;
+			save s to: "../results/" + explo_param + "_" + subsidence_threshold + "_benefit.csv" format: "text" rewrite: true;
 			save
 		["year", 'tong_luc', 'total_2rice_luk', 'total_rice_shrimp', 'tong_tsl', 'tong_bhk', 'total_fruit_tree_lnk', 'climate_maxTAS_shrimp', 'climate_maxPR_thuysan', 'climate_maxTAS_caytrong', 'climate_minPR_caytrong', 'area_shrimp_tsl_risk', 'area_rice_fruit_tree_risk']
-		type: "csv" to: "../results/" + explo_param + "_" + subsidence_threshold + "_landuse_sim.csv" rewrite: true;
+		format: "csv" to: "../results/" + explo_param + "_" + subsidence_threshold + "_landuse_sim.csv" rewrite: true;
 		}
 
 		write "ready";
@@ -108,7 +108,7 @@ global {
 		total_income_lost <- 0.0;
 		total_debt_lu<-[5::0.0,34::0.0,12::0.0,6::0.0,14::0.0,101::0.0];
 		if (year mod 10 = 0) {
-			do load_subsidence((year - 2020) / 10);
+			do load_subsidence(int((year - 2020) / 10));
 			ask active_cell parallel: true {
 				sub <- field_subsidence[location]; //first(cell_salinity overlapping self).grid_value; 
 				if (my_province != nil and my_aez != nil and use_profile_adaptation) {

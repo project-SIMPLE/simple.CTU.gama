@@ -16,7 +16,7 @@ global {
 	field flooding <- field(dem_file);
 	
 	field subsidentField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
-	geometry shape <- envelope(dem_file);
+	geometry shape <- envelope(MKD_WGS84_shape_file);//dem_file);
 	float water_consummation_rate <-0.03;
 	int a <-1;
 	

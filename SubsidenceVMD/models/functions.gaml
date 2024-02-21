@@ -197,7 +197,7 @@ global {
 	}
 
 	action calAreaLUProvince {
-		save "prov_name, dt_luc,dt_luk,dt_lua_tom,dt_tsl,dt_bhk,dt_lnk,dt_khac" to: "../results/hientrang_xa.csv" type: "csv" rewrite: true;
+		save "prov_name, dt_luc,dt_luk,dt_lua_tom,dt_tsl,dt_bhk,dt_lnk,dt_khac" to: "../results/hientrang_xa.csv" format: "csv" rewrite: true;
 		loop tinh_obj over: district {
 		// duyệt hết các cell chồng lắp với huyện để tính diên diện tich
 			area_3rice_luc <- 0.0;
@@ -240,14 +240,14 @@ global {
 			}
 			// Lưu kết quả tính từng loại đất vào biến toại đát ương ứng của huyện
 			save [tinh_obj.NAME_1, area_3rice_luc, area_2rice_luk, area_rice_shrimp, area_shrimp_tsl, area_vegetable_bhk, area_fruit_tree_lnk, area_other] to:
-			"../results/hientrang_tinh.csv" type: "csv" rewrite: false;
+			"../results/hientrang_tinh.csv" format: "csv" rewrite: false;
 			write
 			tinh_obj.NAME_1 + '; ' + area_3rice_luc + '; ' + area_2rice_luk + '; ' + area_rice_shrimp + ';  ' + area_shrimp_tsl + '; ' + area_vegetable_bhk + '; ' + area_fruit_tree_lnk + '; ' + area_other;
 		}
 		// ghu kết quả huyen ra file shapfile thuộc tính gồm 3 cột: ten xa, dt luc, dt tsl. Nếu có thểm thì cứ thêm loại đất vào
-		save district to: "../results/tinh_landuse.shp" type: "shp" attributes:
+		save district to: "../results/tinh_landuse.shp" format: "shp" attributes:
 		["tentinh"::NAME_1, "dt_luc"::area_3rice_luc, "dt_lua_tom"::area_rice_shrimp, "dt_tsl"::area_shrimp_tsl, "dt_luk"::area_2rice_luk, "dt_lnk"::area_fruit_tree_lnk, "dt_bhk"::area_vegetable_bhk, "dt_khac"::area_other];
-		save farming_unit to: "../results/hientrang_sim.tif" type: "geotiff";
+		save farming_unit to: "../results/hientrang_sim.tif" format: "geotiff";
 		write "Calculated area of land-use tpye";
 	}
 
