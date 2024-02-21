@@ -192,7 +192,7 @@ global {
 		//
 		//		}
 		write "In kiem tra categories: " + categories;
-		v_kappa <- kappa(active_cell collect (each.landuse), active_cell collect (each.landuse_obs), categories);
+		v_kappa <- kappa(active_cell collect (each.landuse), active_cell collect (each.index_riceshrimp_neigborb), categories);
 		write "Kappa: " + v_kappa;
 	}
 

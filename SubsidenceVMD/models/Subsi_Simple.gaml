@@ -11,7 +11,7 @@ global {
 	field diffB1_M1_file <-field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
 	
 	
-    field DEM <- field(dem_file);
+    field DEM <- copy(field(dem_file));
 	field flooding <- field(dem_file);
 	
 	field subsidentField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));

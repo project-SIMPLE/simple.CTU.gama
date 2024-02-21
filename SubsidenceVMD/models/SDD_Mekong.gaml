@@ -125,11 +125,11 @@ global {
 			benefit <- 0.0;
 			debt <- 0.0;
 			water_unit <- 0.0;
-			do tinh_chiso_lancan;
+			do calLU_density;
 		}
 
 		ask active_cell parallel: true {
-			do luachonksd;
+			do selectLandUse;
 		}
 
 		ask active_cell parallel: false {

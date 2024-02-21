@@ -16,17 +16,17 @@ global {
 
 grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shapes: false use_regular_agents: false use_neighbors_cache: false {
 	int landuse <- int(grid_value);
-	float chiso_luk_lancan;
-	float chiso_luc_lancan;
-	float chiso_bhk_lancan;
-	float chiso_tsl_lancan;
-	float chiso_lnk_lancan;
-	float chiso_khac_lancan;
+	float index_luk_neigborb;
+	float index_luc_neigborb;
+	float index_bhk_neigborb;
+	float index_tsl_neigborb;
+	float index_lnk_neigborb;
+	float index_other_neigborb;
+	float index_riceshrimp_neigborb;
+	float index_suitability_rice_shrimp;
 	int landuse_obs;
 	int landunit;
-	float chiso_lua_tom_lancan;
-	float chiso_thichnghi_lua_tom;
-	float chiso_khokhan_lua_tom;
+	float index_TechAbility_rice_shrimp;
 	int risk <- 0; // bo sung risk de danh dau cell bi risk. DUng khi kich ban loai risk se xet cac cell nay de chuyen doi sang kieu phu hop honbool risk<- false
 	// 1: risk thuy san; 2 : risk lua
 	int vul_rice <- 0;
@@ -50,7 +50,7 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 	float benefit <- 0.0;
 	map<int, float> my_lu_benefit; //<-[5::34,34::389,12::180,6::98,14::294,101::150]; 
 	float debt <- 0.0;
-	float water_unit <- 0.0;
+	float water_unit <- 0.0 ; 
 
 	init {
 	/*
@@ -65,8 +65,6 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		} else {
 			do die;
 		}
-		
-
 	}
 
 	//	action to_mau {
@@ -110,16 +108,16 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 	//		}
 	//
 	//	}
-	action tinh_chiso_lancan {
+	action calLU_density {
 
 	//so cell xung quanh cuar mot cell co kieu su dung la luk/8 (8-tong so o lan can cua moi o)
 	//dem so cell trong cell_lancan co landuse=6 (6:luk)
-		chiso_luc_lancan <- (cell_lancan count (each.landuse = 5)) / 8;
-		chiso_luk_lancan <- (cell_lancan count (each.landuse = 6)) / 8;
-		chiso_bhk_lancan <- (cell_lancan count (each.landuse = 12)) / 8;
-		chiso_lnk_lancan <- (cell_lancan count (each.landuse = 14)) / 8;
-		chiso_tsl_lancan <- (cell_lancan count (each.landuse = 34)) / 8;
-		chiso_lua_tom_lancan <- (cell_lancan count (each.landuse = 101)) / 8;
+		index_luc_neigborb <- (cell_lancan count (each.landuse = 5)) / 8;
+		index_luk_neigborb <- (cell_lancan count (each.landuse = 6)) / 8;
+		index_bhk_neigborb <- (cell_lancan count (each.landuse = 12)) / 8;
+		index_lnk_neigborb <- (cell_lancan count (each.landuse = 14)) / 8;
+		index_tsl_neigborb <- (cell_lancan count (each.landuse = 34)) / 8;
+		index_riceshrimp_neigborb <- (cell_lancan count (each.landuse = 101)) / 8;
 		//chiso_khac_lancan <-(cell_lancan count (each.landuse=1))/8;
 	}
 
@@ -175,7 +173,7 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		return 0.0;
 	}
 
-	float xet_thichnghi (int madvdd_, int LUT) {
+	float checkSuitability (int madvdd_, int LUT) {
 		float kqthichnghi <- 0.0;
 		if (suitability_map["" + madvdd_ + " " + LUT] = nil) {
 		} else {
@@ -188,14 +186,14 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		return kqthichnghi;
 	}
 
-	float xet_khokhanchuyendoi (int landuse1, int landuse2) {
-		float kqkhokhanchuyendoi <- 0.0;
+	float checkTechAbility (int landuse1, int landuse2) {
+		float resultCheck <- 0.0;
 		if (ability_map["" + landuse1 + " " + landuse2] = nil) {
 		} else {
-			kqkhokhanchuyendoi <- ability_map["" + landuse1 + " " + landuse2];
+			resultCheck <- ability_map["" + landuse1 + " " + landuse2];
 		}
 
-		return kqkhokhanchuyendoi;
+		return resultCheck;
 	}
 	// adaptation
 	//Scenarios1: remove risk by changing land use type: Risk cell in 3 rice crops -> 2 rice crops or 2 rice + 1 other crop; Shrimp ->Intensive with high tech with out support from gov.
@@ -203,7 +201,7 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 	action removerisk_invidual { // scenarios 1
 		if (risk = 1) {
 			if flip(proportion_aquafarmers_adapted) {
-				if (xet_thichnghi(landunit, 101) > 0) {
+				if (checkSuitability(landunit, 101) > 0) {
 					landuse <- 101; // converted to rice-shrimp
 					//budget_supported <- budget_supported + 1;
 					risk <- 0;
@@ -279,7 +277,7 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 			do removerisk_mixed_supp_gov_indv;
 		} }
 
-	action luachonksd {
+	action selectLandUse {
 	//		int old_lu <- landuse;
 		list<list> cands; // <- profile != nil ? landuse_eval_with_profile() : landuse_eval();
 		if (profile = nil and use_subsidence) {
@@ -316,21 +314,21 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 			}
 
 			if (choice = 2) {
-				if (xet_thichnghi(landunit, 12) > 0) {
+				if (checkSuitability(landunit, 12) > 0) {
 					landuse <- 12;
 				}
 
 			}
 
 			if (choice = 3) {
-				if (xet_thichnghi(landunit, 6) > 0) {
+				if (checkSuitability(landunit, 6) > 0) {
 					landuse <- 6;
 				}
 
 			}
 
 			if (choice = 4) {
-				if (xet_thichnghi(landunit, 14) > 0.33) {
+				if (checkSuitability(landunit, 14) > 0.33) {
 					if flip(0.1) {
 						landuse <- 14;
 					}
@@ -340,7 +338,7 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 			}
 
 			if (choice = 5) {
-				if (xet_thichnghi(landunit, 101) > 0) {
+				if (checkSuitability(landunit, 101) > 0) {
 					landuse <- 101;
 				}
 
@@ -358,13 +356,13 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		list<list> candidates;
 		list<float> candtsl;
 		list<float> cand_luatom;
-		candtsl << chiso_tsl_lancan;
-		candtsl << xet_khokhanchuyendoi(landuse, 34);
-		candtsl << xet_thichnghi(landunit, 34);
+		candtsl << index_tsl_neigborb;
+		candtsl << checkTechAbility(landuse, 34);
+		candtsl << checkSuitability(landunit, 34);
 		candtsl <<  lu_benefit[34] / max_lu_benefit; 
-		cand_luatom << chiso_lua_tom_lancan;
-		cand_luatom << xet_khokhanchuyendoi(landuse, 101);
-		cand_luatom << xet_thichnghi(landunit, 101);
+		cand_luatom << index_riceshrimp_neigborb;
+		cand_luatom << checkTechAbility(landuse, 101);
+		cand_luatom << checkSuitability(landunit, 101);
 		cand_luatom <<  lu_benefit[101] / max_lu_benefit; 
 		//nap cac ung vien vao danh sach candidates
 		candidates << candtsl;
@@ -508,15 +506,15 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 
 		//dua dat tinh cua cac ung vien
 		bool fx <- flip(supported_lu_type[profile + 5]);
-		candluc << fx ? chiso_luc_lancan : 0;
-		candluc << fx ? xet_khokhanchuyendoi(landuse, 5) : 0;
-		candluc << fx ? max([0, xet_thichnghi(landunit, 5) - risk_suitab_5]) : 0;
+		candluc << fx ? index_luc_neigborb : 0;
+		candluc << fx ? checkTechAbility(landuse, 5) : 0;
+		candluc << fx ? max([0, checkSuitability(landunit, 5) - risk_suitab_5]) : 0;
 		candluc << fx ? (my_lu_benefit[5] / max_lu_benefit) : 0;
 		//dua dac tinh ung vien tsl
 		fx <- flip(supported_lu_type[profile + 34]);
-		candtsl << fx ? chiso_tsl_lancan : 0;
-		candtsl << fx ? xet_khokhanchuyendoi(landuse, 34) : 0;
-		candtsl << fx ? max([0, xet_thichnghi(landunit, 34) - risk_suitab_34]) : 0;
+		candtsl << fx ? index_tsl_neigborb : 0;
+		candtsl << fx ? checkTechAbility(landuse, 34) : 0;
+		candtsl << fx ? max([0, checkSuitability(landunit, 34) - risk_suitab_34]) : 0;
 		candtsl << fx ? (my_lu_benefit[34] / max_lu_benefit) : 0;
 		//		if landuse=101{
 		//			write "kk:" +xet_khokhanchuyendoi(landuse, 34)+ "tn:"+xet_thichnghi(madvdd, 34);
@@ -524,27 +522,27 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 
 		//dua dac tinh ung vien hnk
 		fx <- flip(supported_lu_type[profile + 12]);
-		candbhk << fx ? chiso_bhk_lancan : 0;
-		candbhk << fx ? xet_khokhanchuyendoi(landuse, 12) : 0;
-		candbhk << fx ? xet_thichnghi(landunit, 12) : 0;
+		candbhk << fx ? index_bhk_neigborb : 0;
+		candbhk << fx ? checkTechAbility(landuse, 12) : 0;
+		candbhk << fx ? checkSuitability(landunit, 12) : 0;
 		candbhk << fx ? (my_lu_benefit[12] / max_lu_benefit) : 0;
 		//dua dac tinh ung vien lnk
 		fx <- flip(supported_lu_type[profile + 6]);
-		candluk << fx ? chiso_luk_lancan : 0;
-		candluk << fx ? xet_khokhanchuyendoi(landuse, 6) : 0;
-		candluk << fx ? xet_thichnghi(landunit, 6) : 0;
+		candluk << fx ? index_luk_neigborb : 0;
+		candluk << fx ? checkTechAbility(landuse, 6) : 0;
+		candluk << fx ? checkSuitability(landunit, 6) : 0;
 		candluk << fx ? (my_lu_benefit[6] / max_lu_benefit) : 0;
 		//dua dac tinh ung vien rst
 		fx <- flip(supported_lu_type[profile + 14]);
-		candlnk << fx ? chiso_lnk_lancan : 0;
-		candlnk << fx ? xet_khokhanchuyendoi(landuse, 14) : 0;
-		candlnk << fx ? xet_thichnghi(landunit, 14) : 0;
+		candlnk << fx ? index_lnk_neigborb : 0;
+		candlnk << fx ? checkTechAbility(landuse, 14) : 0;
+		candlnk << fx ? checkSuitability(landunit, 14) : 0;
 		candlnk << fx ? (my_lu_benefit[14] / max_lu_benefit) : 0;
 		// bổ sung thêm ứng viên lua-tom
 		fx <- flip(supported_lu_type[profile + 101]);
-		cand_luatom << fx ? chiso_lua_tom_lancan : 0;
-		cand_luatom << fx ? xet_khokhanchuyendoi(landuse, 101) : 0;
-		cand_luatom << fx ? xet_thichnghi(landunit, 101) : 0;
+		cand_luatom << fx ? index_riceshrimp_neigborb : 0;
+		cand_luatom << fx ? checkTechAbility(landuse, 101) : 0;
+		cand_luatom << fx ? checkSuitability(landunit, 101) : 0;
 		cand_luatom << fx ? (my_lu_benefit[101] / max_lu_benefit) : 0; // tamj thowi
 		//nap cac ung vien vao danh sach candidates
 		candidates << candluc;
@@ -570,38 +568,38 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		list<float> cand_luatom;
 
 		//dua dat tinh cua cac ung vien
-		candluc << chiso_luc_lancan;
-		candluc << xet_khokhanchuyendoi(landuse, 5);
-		candluc << max([0, xet_thichnghi(landunit, 5) - risk_suitab_5]);
+		candluc << index_luc_neigborb;
+		candluc << checkTechAbility(landuse, 5);
+		candluc << max([0, checkSuitability(landunit, 5) - risk_suitab_5]);
 		candluc << my_lu_benefit[5] / max_lu_benefit;
 		//dua dac tinh ung vien tsl
-		candtsl << chiso_tsl_lancan;
-		candtsl << xet_khokhanchuyendoi(landuse, 34);
-		candtsl << max([0, xet_thichnghi(landunit, 34) - risk_suitab_34]);
+		candtsl << index_tsl_neigborb;
+		candtsl << checkTechAbility(landuse, 34);
+		candtsl << max([0, checkSuitability(landunit, 34) - risk_suitab_34]);
 		candtsl << my_lu_benefit[34] / max_lu_benefit;
 		//		if landuse=101{
 		//			write "kk:" +xet_khokhanchuyendoi(landuse, 34)+ "tn:"+xet_thichnghi(madvdd, 34);
 		//		}
 
 		//dua dac tinh ung vien hnk
-		candbhk << chiso_bhk_lancan;
-		candbhk << xet_khokhanchuyendoi(landuse, 12);
-		candbhk << xet_thichnghi(landunit, 12);
+		candbhk << index_bhk_neigborb;
+		candbhk << checkTechAbility(landuse, 12);
+		candbhk << checkSuitability(landunit, 12);
 		candbhk << my_lu_benefit[12] / max_lu_benefit;
 		//dua dac tinh ung vien lnk
-		candluk << chiso_luk_lancan;
-		candluk << xet_khokhanchuyendoi(landuse, 6);
-		candluk << xet_thichnghi(landunit, 6);
+		candluk << index_luk_neigborb;
+		candluk << checkTechAbility(landuse, 6);
+		candluk << checkSuitability(landunit, 6);
 		candluk << my_lu_benefit[6] / max_lu_benefit;
 		//dua dac tinh ung vien rst
-		candlnk << chiso_lnk_lancan;
-		candlnk << xet_khokhanchuyendoi(landuse, 14);
-		candlnk << xet_thichnghi(landunit, 14);
+		candlnk << index_lnk_neigborb;
+		candlnk << checkTechAbility(landuse, 14);
+		candlnk << checkSuitability(landunit, 14);
 		candlnk << my_lu_benefit[14] / max_lu_benefit;
 		// bổ sung thêm ứng viên lua-tom
-		cand_luatom << chiso_lua_tom_lancan;
-		cand_luatom << xet_khokhanchuyendoi(landuse, 101);
-		cand_luatom << xet_thichnghi(landunit, 101);
+		cand_luatom << index_riceshrimp_neigborb;
+		cand_luatom << checkTechAbility(landuse, 101);
+		cand_luatom << checkSuitability(landunit, 101);
 		cand_luatom << my_lu_benefit[101] / max_lu_benefit; 
 		//nap cac ung vien vao danh sach candidates
 		candidates << candluc;
@@ -624,38 +622,38 @@ grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shap
 		list<float> cand_luatom;
 
 		//dua dat tinh cua cac ung vien
-		candluc << chiso_luc_lancan;
-		candluc << xet_khokhanchuyendoi(landuse, 5);
-		candluc << xet_thichnghi(landunit, 5);
+		candluc << index_luc_neigborb;
+		candluc << checkTechAbility(landuse, 5);
+		candluc << checkSuitability(landunit, 5);
 		candluc << lu_benefit[5] / max_lu_benefit;
 		//dua dac tinh ung vien tsl
-		candtsl << chiso_tsl_lancan;
-		candtsl << xet_khokhanchuyendoi(landuse, 34);
-		candtsl << xet_thichnghi(landunit, 34);
+		candtsl << index_tsl_neigborb;
+		candtsl << checkTechAbility(landuse, 34);
+		candtsl << checkSuitability(landunit, 34);
 		candtsl << lu_benefit[34] / max_lu_benefit;
 		//		if landuse=101{
 		//			write "kk:" +xet_khokhanchuyendoi(landuse, 34)+ "tn:"+xet_thichnghi(madvdd, 34);
 		//		}
 
 		//dua dac tinh ung vien hnk
-		candbhk << chiso_bhk_lancan;
-		candbhk << xet_khokhanchuyendoi(landuse, 12);
-		candbhk << xet_thichnghi(landunit, 12);
+		candbhk << index_bhk_neigborb;
+		candbhk << checkTechAbility(landuse, 12);
+		candbhk << checkSuitability(landunit, 12);
 		candbhk << lu_benefit[12] / max_lu_benefit;
 		//dua dac tinh ung vien lnk
-		candluk << chiso_luk_lancan;
-		candluk << xet_khokhanchuyendoi(landuse, 6);
-		candluk << xet_thichnghi(landunit, 6);
+		candluk << index_luk_neigborb;
+		candluk << checkTechAbility(landuse, 6);
+		candluk << checkSuitability(landunit, 6);
 		candluk << lu_benefit[6] / max_lu_benefit;
 		//dua dac tinh ung vien rst
-		candlnk << chiso_lnk_lancan;
-		candlnk << xet_khokhanchuyendoi(landuse, 14);
-		candlnk << xet_thichnghi(landunit, 14);
+		candlnk << index_lnk_neigborb;
+		candlnk << checkTechAbility(landuse, 14);
+		candlnk << checkSuitability(landunit, 14);
 		candlnk << lu_benefit[14] / max_lu_benefit;
 		// bổ sung thêm ứng viên lua-tom
-		cand_luatom << chiso_lua_tom_lancan;
-		cand_luatom << xet_khokhanchuyendoi(landuse, 101);
-		cand_luatom << xet_thichnghi(landunit, 101);
+		cand_luatom << index_riceshrimp_neigborb;
+		cand_luatom << checkTechAbility(landuse, 101);
+		cand_luatom << checkSuitability(landunit, 101);
 		cand_luatom << my_lu_benefit[101] / max_lu_benefit;
 		//nap cac ung vien vao danh sach candidates
 		candidates << candluc;
