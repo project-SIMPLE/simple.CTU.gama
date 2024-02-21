@@ -196,7 +196,7 @@ global {
 		write "Kappa: " + v_kappa;
 	}
 
-	action tinh_dtmx {
+	action calAreaLUProvince {
 		save "prov_name, dt_luc,dt_luk,dt_lua_tom,dt_tsl,dt_bhk,dt_lnk,dt_khac" to: "../results/hientrang_xa.csv" type: "csv" rewrite: true;
 		loop tinh_obj over: district {
 		// duyệt hết các cell chồng lắp với huyện để tính diên diện tich
@@ -207,7 +207,7 @@ global {
 			area_vegetable_bhk <- 0.0;
 			area_fruit_tree_lnk <- 0.0;
 			area_other <- 0.0;
-			//đã chỉnh đến đây
+
 			ask active_cell overlapping tinh_obj {
 				if (landuse = 5) {
 					area_3rice_luc <- area_3rice_luc + pixel_size;
@@ -248,36 +248,13 @@ global {
 		save district to: "../results/tinh_landuse.shp" type: "shp" attributes:
 		["tentinh"::NAME_1, "dt_luc"::area_3rice_luc, "dt_lua_tom"::area_rice_shrimp, "dt_tsl"::area_shrimp_tsl, "dt_luk"::area_2rice_luk, "dt_lnk"::area_fruit_tree_lnk, "dt_bhk"::area_vegetable_bhk, "dt_khac"::area_other];
 		save farming_unit to: "../results/hientrang_sim.tif" type: "geotiff";
-		write "Đa tinh dien tich hien trang theo xa xong";
+		write "Calculated area of land-use tpye";
 	}
 
-	action gan_dvdd {
+	action set_landunit {
 		ask active_cell parallel: true {
-			madvdd <- field_land_unit[location];
+			landunit <- field_land_unit[location];
+			//write madvdd;
 		}
-		//		loop dvdd_obj over: land_unit {
-		//			ask active_cell overlapping dvdd_obj {
-		//				madvdd <- dvdd_obj.dvdd;
-		//			}
-		//
-		//		}
-
 	}
-
-	//	action set_dyke {
-	//		loop dyke_obj over: dyke_protected {
-	//			ask active_cell overlapping dyke_obj {
-	//				madvdd <- dyke_obj.de;
-	//			}
-	//
-	//		}
-	//
-	//	}
-	//	action gan_cell_hc {
-	//	//		ask cell_dat {
-	//	//			landuse_obs <- cell_dat_2010[self.grid_x, self.grid_y].landuse;
-	//	//		}
-	//
-	//	}
-
 }

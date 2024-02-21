@@ -38,13 +38,8 @@ global {
 			cell_lancan <- (neighbors where (!dead(each)) where (each.grid_value != 0.0)); //1 ban kinh lan can laf 2 cell = 8 cell xung quanh 1 cell
 			 
 		}
-
 		write "cell initialized";
-		//
-		//		ask active_cell_dat2010 {
-		//			do tomau;
-		//		}
-		do gan_dvdd;
+		do set_landunit;
 		//		do gan_cell_hc;
 		criteria <-
 		[["name"::"lancan", "weight"::w_neighbor_density], ["name"::"khokhan", "weight"::w_ability], ["name"::"thichnghi", "weight"::w_suitability], ["name"::"loinhuan", "weight"::w_profit]];

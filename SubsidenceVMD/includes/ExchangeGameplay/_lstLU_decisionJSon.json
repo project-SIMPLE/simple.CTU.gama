@@ -1,0 +1,10 @@
+{
+"decision": [
+{ "id": 1, "landuse": 5, "lat": 1046945.868, "lon": 611520.245, "landunit": 3, "aez": 1 }, 
+{ "id": 2, "landuse": 34, "lat": 1039836.148, "lon": 597421.309, "landunit": 2, "aez": 1 }, 
+{ "id": 3, "landuse": 14, "lat": 1094303.832, "lon": 594047.205, "landunit": 1, "aez": 1 }, 
+{ "id": 4, "landuse": 6, "lat": 1077312.807, "lon": 599951.888, "landunit": 5, "aez": 2 }, 
+{ "id": 5, "landuse": 12, "lat": 1061767.826, "lon": 632126.383, "landunit": 4, "aez": 2 },
+{ "id": 6, "landuse": 5, "lat": 1062370.345, "lon": 594408.716, "landunit": 5, "aez": 1 }
+]
+}
