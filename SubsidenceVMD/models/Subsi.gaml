@@ -8,7 +8,7 @@ global {
 	int _year <- 2018;
 	
 	
-	file dem_file <- grid_file("../includes/DEM/dem_500x500_align.tif");
+	grid_file dem_file <- grid_file("../includes/DEM/dem_500x500_extendbound.tif");
 	field diffB1_M1_file <-field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
 	
 	

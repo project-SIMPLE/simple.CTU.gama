@@ -4,7 +4,9 @@ import "entities/farming_unit.gaml"
 //import "entities/cell_dat_2010.gaml"
 
 global {
-	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ_clipped.tif");
+	
+	grid_file mekongdelta0_grid_file <- grid_file("../includes/AdminBound/mekongdelta.tif");
+	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ.tif");
 //	file cell_file <- grid_file("../includes/subsidence/subscidence_tot_2030_500x500.tif");
 	grid_file cell_salinity_file <- grid_file("../includes/mk_sal_2030_45_500x500.tif");
 	grid_file dvdd_file <- grid_file("../includes/madvdd.tif");
@@ -32,12 +34,12 @@ global {
 	map<int,float> prov_sub_thres<-[];
 	//	file cell_file <- grid_file("../includes/lu_100x100_mx_2005_new.tif");
 //	file MKD_bound <- shape_file("../includes/MKD_district.shp"); 
-	geometry shape <- envelope(cell_file);
+	geometry shape <- envelope(mekongdelta0_grid_file);
 	list<farming_unit> active_cell <-[];//<- cell_dat where (each.grid_value != 8.0);
 	file song_file <- shape_file('../includes/road_polyline.shp');
 	file duong_file <- shape_file('../includes/river_region.shp');
 //	file dvdd_file <- shape_file("../includes/vmd_land_unit_cleaned.shp");
-	file MKD_file <- shape_file("../includes/MKD.shp");
+	file MKD_file <- shape_file("../includes/AdminBound/MKD_WGS84.shp");
 	file dyke_file <- shape_file("../includes/mk_dyke_region.shp");
 	file aez_file <- shape_file("../includes/AEZ/aezone_MKD_region.shp");
 	matrix ability_matrix;
