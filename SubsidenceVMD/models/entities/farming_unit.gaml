@@ -16,6 +16,8 @@ global {
 
 grid farming_unit file: cell_file neighbors: 8 schedules: [] use_individual_shapes: false use_regular_agents: false use_neighbors_cache: false {
 	int landuse <- int(grid_value);
+	int landuse_tmp <- int(grid_value);
+	
 	float index_luk_neigborb;
 	float index_luc_neigborb;
 	float index_bhk_neigborb;

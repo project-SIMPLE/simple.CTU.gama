@@ -7,11 +7,8 @@ global {
 	
 	grid_file mekongdelta0_grid_file <- grid_file("../includes/AdminBound/mekongdelta.tif");
 	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ.tif");
-//	file cell_file <- grid_file("../includes/subsidence/subscidence_tot_2030_500x500.tif");
 	grid_file cell_salinity_file <- grid_file("../includes/mk_sal_2030_45_500x500.tif");
 	grid_file dvdd_file <- grid_file("../includes/madvdd.tif");
-//	grid_file cell_subsidence_file <- grid_file("../includes/subsidence/subscidence_tot_2030_500x500_nodata.tif");
-//	grid_file cell_subsidence_file <- grid_file("../includes/subsidence/Scenario_B2/B2_2020.tif");
 	list<string> file_subsidence1<-["../includes/subsidence/Scenario_M1/M1_2020.tif",
 		"../includes/subsidence/Scenario_M1/M1_2030.tif",
 		"../includes/subsidence/Scenario_M1/M1_2040.tif",
@@ -32,8 +29,6 @@ global {
 	float subsidence_threshold<-0.5;
 	float subsidence_macro_threshold<-0.2;
 	map<int,float> prov_sub_thres<-[];
-	//	file cell_file <- grid_file("../includes/lu_100x100_mx_2005_new.tif");
-//	file MKD_bound <- shape_file("../includes/MKD_district.shp"); 
 	geometry shape <- envelope(mekongdelta0_grid_file);
 	list<farming_unit> active_cell <-[];//<- cell_dat where (each.grid_value != 8.0);
 	file song_file <- shape_file('../includes/road_polyline.shp');

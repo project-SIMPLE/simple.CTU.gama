@@ -6,17 +6,12 @@ global {
 	string scenarioM<-"M1/M1_";
 	string currentScenario;
 	int _year <- 2018;
-	
-	
 	grid_file dem_file <- grid_file("../includes/DEM/dem_500x500_extendbound.tif");
 	field diffB1_M1_file <-field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
-	
-	
     field DEM <- field(dem_file);
 	field flooding <- field(dem_file);
-	
 	field subsidentField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
-	geometry shape <- envelope(MKD_WGS84_shape_file);//dem_file);
+	geometry shape <- envelope(dem_file);//dem_file);
 	float water_consummation_rate <-0.03;
 	int a <-1;
 	

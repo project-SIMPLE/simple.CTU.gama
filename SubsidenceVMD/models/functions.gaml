@@ -9,24 +9,6 @@ import "entities/dyke_protected.gaml"
 
 global {
 
-//	action load_climate_PR {
-//		string fpath <- "../includes/data_sample/district_weather_proj_model1.csv";
-//		write fpath;
-//		if (!file_exists(fpath)) {
-//			return;
-//		}
-//
-//		file risk_csv_file <- csv_file(fpath, ";", true);
-//		matrix data <- (risk_csv_file.contents);
-//		loop i from: 0 to: data.rows - 1 {
-//			huyen t <- (huyen where (each.ID_1 = int(data[0, i]) and each.ID_2 = int(data[2, i])))[0];
-//			ask t {
-//				data_pr <- data row_at i;
-//			}
-//
-//		}
-//
-//	}
 	action load_climate_TAS {
 	//		string fpath <- "../includes/DATA_TAS.csv";
 		string fpath <- risk_csv_file_path; // "../includes/data_sample/district_weather_proj_model1.csv";
@@ -77,31 +59,7 @@ global {
 
 	}
 
-	//	action tinhtongdt {
-	//		tong_luc <- 0.0;
-	//		total_2rice_luk <- 0.0;
-	//		total_rice_shrimp <- 0.0;
-	//		tong_tsl <- 0.0;
-	//		total_fruit_tree_lnk <- 0.0;
-	//		tong_bhk <- 0.0;
-	//		total_rice_shrimp <- 0.0;
-	//		ask active_cell {
-	//		}
-	//
-	//		//		ask active_cell {
-	//		//			if (landuse > 0) and (landuse != 14) and (landuse != 5) and (landuse != 6) and (landuse != 100) and (landuse != 12) and (landuse != 34) {
-	//		//				tong_khac <- tong_khac + 100 * 100 / 10000; //kichs thuowcs mooix cell 50*50m tuwf duwx lieeuj rasster
-	//		//			}
-	//		//
-	//		//		}
-	//		write "Tong dt lua:" + tong_luc;
-	//		write "Tong dt lúa khác:" + total_2rice_luk;
-	//		write "Tong dt lúa tom:" + total_rice_shrimp;
-	//		write "Tong dt ts:" + tong_tsl;
-	//		write "Tong dt rau mau:" + tong_bhk;
-	//		write "Tong dt lnk:" + total_fruit_tree_lnk;
-	//		write "Tong dt khac:" + total_rice_shrimp;
-	//	}
+
 	action load_cost_benefit_data {
 		matrix cb_matrix <- matrix(csv_file("../includes/cost_benefit.csv", true));
 		loop i from: 0 to: cb_matrix.rows - 1 {

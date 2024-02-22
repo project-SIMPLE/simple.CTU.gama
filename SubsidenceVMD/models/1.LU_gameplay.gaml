@@ -1,10 +1,10 @@
 /**
 * Name: readLUgameplay
 * Based on the internal empty template. 
-* Author: Lenovo
+* Author: Quang Truong, Nghi Huynh 
 * Tags: 
 */
-model readLUgameplay   
+model LU_Gameplay   
 
 import "entities/farming_unit.gaml"
 import "functions.gaml"
@@ -36,7 +36,6 @@ global {
 	float calWater_unit{
 		float tmpWu<-0.0;
 		ask active_cell {
-			//update: wu_cost[landuse]*pixel_size /1E9; // biliion m3
 			tmpWu <- tmpWu + wu_cost[landuse]*pixel_size /1E9; // biliion m3 ;
 		}
 		return tmpWu;
@@ -45,7 +44,7 @@ global {
 		VR_decision <- VR_json["decision"];
 		write VR_decision;
         loop i_decision over: VR_decision {                 
-            //write "x:" + i_decision["lon"] + "; lat:"+i_decision["lat"] +"; landuse:"+ int(i_decision["landuse"]);
+            write "x:" + i_decision["lon"] + "; lat:"+i_decision["lat"] +"; landuse:"+ int(i_decision["landuse"]);
         }
 	}
 	reflex set_LU_gameplay{
@@ -55,17 +54,27 @@ global {
             pt1 <- point(to_GAMA_CRS(pt1, "EPSG:32648"));
             list<farming_unit> lstLU;
             lstLU <- active_cell intersecting pt1;
+            write "So luong cell dc chọn voi diem giao:"+ length(lstLU);
             if length(lstLU)>0{
 	            ask lstLU{
-	            //	write "interecting:" +self.landuse + "; land unit:"+ self.landunit;
+					write "interecting:" +self.landuse + "; land use to update:"+ int(i["landuse"]);
 	            	list<farming_unit> lstLU_selected<-  active_cell  where (each.landuse=self.landuse) ;//(each.landunit=self.landunit and each.landuse=self.landuse);
+	            	write "Num ber of cell:" + length(lstLU_selected);
 	            	ask  lstLU_selected { //where (each.landuse=self.landuse) {
-	            		self.landuse <-int(i["landuse"]);// 
+	            		//write "Curent LU:" + length(lstLU_selected);
+	            		// temporal update the landuse
+	            		self.landuse_tmp <-int(i["landuse"]);// 
 	            		//write "landuse choiced :" + landuse;
-	            		self.grid_value <- float(landuse) ;
+//	            		
 	            	}     	
-	            }            	
+	            }       
+	                 	
             }
+        }
+        // after finish asigned new landuse; set landuse = landuse_tmp
+        ask active_cell{
+        	landuse <-landuse_tmp;
+        	self.grid_value <- float(landuse) ;
         }
        
 	}
