@@ -88,7 +88,7 @@ global {
         }
         string sSuggestion <- "{\"information\": [{\"waterunit\": 15.6},{\"total_profit\": 15000.0}]}";
         map pp<-["waterunit":: 15.6];
-		save to_json(pp) to: "../includes/ExchangeGameplay/_infoGamePlay.json" format:"text" rewrite: true;//includes/ExchangeGameplay/_suggestGamePlay.json");
+	//	save to_json(pp) to: "../includes/ExchangeGameplay/_infoGamePlay.json" format:"text" rewrite: true;//includes/ExchangeGameplay/_suggestGamePlay.json");
 	}
 } 
 
