@@ -30,7 +30,7 @@ global {
 	float size_factor <- 10000.0;
 	field DEM <- copy(field(dem_file));
 	float seed <- 0.5810964478013678;
-
+	int totalin<-0;
 	init {
 		create land from: MKD_province0_shape_file;
 		create river from: road_polyline0_shape_file;
@@ -43,7 +43,7 @@ global {
 
 	}
 
-	reflex loops when: flip(0.01) {
+	reflex loops when: flip(0.1) {
 		create water {
 			location <- any_location_in(bound.contour);
 			o <- center;
@@ -107,7 +107,8 @@ species water {
 		}
 
 		do manage_move(dist_o);
-		if (self distance_to o) < 1000.0 {
+		if (self distance_to o) < 500.0 {
+			totalin<-totalin+1;
 			do die;
 		}
 
@@ -116,6 +117,24 @@ species water {
 	list<float> compute_distance (float alpha, float dist_o) {
 		float f_alpha <- f(alpha, dist_o);
 		return [dist_o ^ 2 + f_alpha ^ 2 - 2 * dist_o * f_alpha * cos(alpha0 - alpha), f_alpha];
+	}
+
+	point force_repulsion_wall (tower w) {
+		if (location intersects w) {
+			float strength <- k * shoulder_length  / size_factor;
+			point pt_w <- (w.shape.contour closest_points_with location)[0];
+			point vv <- {pt_w.x - location.x, pt_w.y - location.y};
+			float n <- norm(vv);
+			return vv * (strength / n);
+		} else {
+			float strength <- k * (shoulder_length - (location distance_to w)) / size_factor;
+			c <- c + strength;
+			point pt_w <- (w closest_points_with location)[0];
+			point vv <- {location.x - pt_w.x, location.y - pt_w.y};
+			float n <- norm(vv);
+			return vv * (strength / n);
+		}
+
 	}
 
 	point force_repulsion (water other) {
@@ -129,6 +148,15 @@ species water {
 	float f (float alpha, float dmax_r) {
 		geometry line <- line([location, location + ({cos(alpha), sin(alpha)} * dmax_r)]);
 		list<water> ps <- (water overlapping line) - self;
+		list<tower> ws <- tower overlapping line;
+		loop w over: ws {
+			line <- line - w;
+			if line = nil {
+				return 0.0;
+			}
+
+		}
+
 		loop p over: ps {
 			line <- line - p;
 			if line = nil {
@@ -160,11 +188,20 @@ species water {
 		return sf / m;
 	}
 
+	point compute_sf_wall {
+		point sf <- {0.0, 0.0};
+		loop w over: tower overlapping self {
+			sf <- sf + force_repulsion_wall(w);
+		}
+
+		return sf / m;
+	}
+
 	action manage_move (float dist_o) {
 		float vdes <- min(v0, dh / tau);
 		point vdes_vector <- {cos(heading), sin(heading)};
 		vdes_vector <- vdes_vector * vdes;
-		acc <- (vdes_vector - vi) / tau + compute_sf_pedestrian();
+		acc <- (vdes_vector - vi) / tau + compute_sf_pedestrian() + compute_sf_wall();
 		vi <- vi + (acc * step);
 		location <- location + (vi * step * size_factor / 5);
 	}
@@ -178,9 +215,9 @@ species water {
 }
 
 species tower {
-	float radius <- 5 * size_factor;
-	int freq <- 50;
-
+	float radius <- 3 * size_factor;
+	int freq <- 20;
+	geometry shape<-square(size_factor/10);
 	reflex shooting when: ((cycle mod freq) = 0) {
 		water tar <- first(water at_distance radius);
 		if (tar != nil) {
@@ -202,13 +239,13 @@ species tower {
 
 species bullet skills: [moving] {
 	water mytarget;
-	float speed <- 12000 #m / #s;
+	float speed <- 24000 #m / #s;
 
 	reflex chase {
 		do goto target: mytarget;
 		if (self distance_to mytarget) < 100.0 {
 			ask mytarget {
-				m <- m - 10;
+				m <- m - 100;
 				if (m < 10) {
 					do die;
 				}
@@ -221,7 +258,7 @@ species bullet skills: [moving] {
 	}
 
 	aspect default {
-		draw triangle(size_factor / 3) depth: 1000  at: location+ {0, 0, 1000} rotate: heading + 90 color: #green;
+		draw triangle(size_factor / 3) depth: 1000 at: location + {0, 0, 1000} rotate: heading + 90 color: #green;
 	}
 
 }
@@ -246,13 +283,16 @@ experiment main type: gui {
 	list<rgb> depth_color <- palette([#grey, #black]);
 	output synchronized: true {
 		layout #stack consoles: false parameters: false;
-		display d1 type: 3d background: #black axes:false{
+		display d1 type: 3d background: #black axes: false {
 			species land;
 			species river;
 			mesh DEM color: depth_color no_data: -9999.0 smooth: false triangulation: true;
 			species tower;
 			species bullet;
 			species water;
+			graphics s{
+				draw ""+totalin size:10000 color:#red;
+			}
 		}
 		//		display d2 type: 3d background:#black{
 		//			camera 'default' location: {260886.2195,95533.6623,1922.7942} target: {255245.6687,100793.5609,0.0};
