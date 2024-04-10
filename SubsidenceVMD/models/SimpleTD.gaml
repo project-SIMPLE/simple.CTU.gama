@@ -27,14 +27,14 @@ global {
 	float P_tau <- 0.5 #s;
 	float P_dmax <- 8.0 #m * 1000;
 	float P_k <- 1.0 * 10 ^ 3;
-	float size_factor <- 5000.0;
+	float size_factor <- 10000.0;
 	field DEM <- copy(field(dem_file));
-	float seed <- 0.9835383710596486;
+	float seed <- 0.5810964478013678;
 
 	init {
 		create land from: MKD_province0_shape_file;
 		create river from: road_polyline0_shape_file;
-		loop times: 10 {
+		loop times: 5 {
 			create tower {
 				location <- any_location_in(any(river));
 			}
@@ -75,7 +75,7 @@ species water {
 	float heading;
 	point acc <- {0, 0};
 	point vi <- {0, 0};
-	float c; 
+	float c;
 
 	init {
 		int num <- int(2 * teta0 / disc_factor);
@@ -166,7 +166,7 @@ species water {
 		vdes_vector <- vdes_vector * vdes;
 		acc <- (vdes_vector - vi) / tau + compute_sf_pedestrian();
 		vi <- vi + (acc * step);
-		location <- location + (vi * step * 1000);
+		location <- location + (vi * step * size_factor / 5);
 	}
 
 	aspect default {
@@ -202,7 +202,7 @@ species tower {
 
 species bullet skills: [moving] {
 	water mytarget;
-	float speed <- 6000 #m / #s;
+	float speed <- 12000 #m / #s;
 
 	reflex chase {
 		do goto target: mytarget;
@@ -221,7 +221,7 @@ species bullet skills: [moving] {
 	}
 
 	aspect default {
-		draw cube(size_factor / 3) color: #green;
+		draw triangle(size_factor / 3) depth: 1000  at: location+ {0, 0, 1000} rotate: heading + 90 color: #green;
 	}
 
 }
@@ -245,10 +245,11 @@ species river {
 experiment main type: gui {
 	list<rgb> depth_color <- palette([#grey, #black]);
 	output synchronized: true {
-		layout #stack consoles:false parameters:false;
-		display d1 type: 3d background: #black {
+		layout #stack consoles: false parameters: false;
+		display d1 type: 3d background: #black axes:false{
 			species land;
 			species river;
+			mesh DEM color: depth_color no_data: -9999.0 smooth: false triangulation: true;
 			species tower;
 			species bullet;
 			species water;
