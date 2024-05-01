@@ -30,6 +30,8 @@ global {
 			location <- a[2].location;
 		}
 
+		create player;
+
 		//		create tree number: 3;
 		//		create enemy number: 3;
 		//		create pumper number: 3;
@@ -52,13 +54,16 @@ global {
 		}
 
 		if (id contains "SpawnEnemy") {
-			warning t <- first(warning where (each._id = id));
-			if (t != nil) {
-				ask t {
-					do die;
-				}
-
+			ask warning {
+				do die;
 			}
+			//			warning t <- first(warning where (each._id = id));
+			//			if (t != nil) {
+			//				ask t {
+			//					do die;
+			//				}
+			//
+			//			}
 
 		}
 
@@ -94,6 +99,16 @@ global {
 
 		ask gate {
 			do die;
+		}
+
+	}
+
+	action move_player_main (string id, int x, int y, int z, int angle) {
+		x <- (100 - x) * 1.6 + 10;
+		y <- y * 1.8 + 100;
+		ask player {
+			location <- {x, y};
+			heading <- angle;
 		}
 
 	}
@@ -194,6 +209,15 @@ global {
 grid a width: 2 height: 2 {
 }
 
+species player {
+	int heading;
+
+	aspect default {
+		draw triangle(5) rotate: heading color: #yellow;
+	}
+
+}
+
 species enemy {
 	string _id;
 
@@ -214,9 +238,17 @@ species tree {
 
 species warning {
 	string _id;
+	int count <- 0;
 
+	//	reflex ss {
+	//		count <- count + 1;
+	//		if (count > 100) {
+	//			do die;
+	//		}
+	//
+	//	}
 	aspect default {
-		draw iwarning border: #red size: 5;
+		draw iwarning border: #red size: 8;
 	}
 
 }
@@ -272,6 +304,7 @@ experiment Display type: gui autorun: true {
 			species warning;
 			species pumper;
 			species enemy;
+			species player;
 		}
 
 	}
