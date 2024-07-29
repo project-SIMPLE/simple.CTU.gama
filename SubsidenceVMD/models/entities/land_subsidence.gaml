@@ -45,7 +45,7 @@ species land_subsidence {
 	}
 
 	aspect default {
-		draw shape empty: true border: #gray;
+		draw shape wireframe: true border: #gray;
 	}
 
 }
