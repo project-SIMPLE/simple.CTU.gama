@@ -193,7 +193,7 @@ experiment "Abstract"   {
 
 		display "Benefit - Debt" type: java2D {
 			chart "Layer" type: series {
-				data "Benefit" style: line value: total_benefit color: #blue;
+//				data "Benefit" style: line value: total_benefit color: #blue;
 				data "Debt" style: line value: total_debt  color: #red; 
 				data "WU" style: line value: total_wu color: #green;
 			}
