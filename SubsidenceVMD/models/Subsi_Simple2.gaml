@@ -37,9 +37,15 @@ global {
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
 		create GPlayLand from: players0_shape_file {
-			create Pumper number:1; 
-			create Lake number:1; 
-			create SluiceGate number:1; 			
+			create Pumper number:1{
+				location <- any_location_in (myself.shape);
+			}
+			create Lake number:1{
+				location <- any_location_in (myself.shape);
+			}
+			create SluiceGate number:1{
+				location <- any_location_in (myself.shape);
+			}			
 		}
 		create river from: river_region0_shape_file;
 		do load_WU_data;	
@@ -130,7 +136,6 @@ species GPlayLand {
 	reflex{
 		volumePump <- numberPumper * maxPumperVolume; 
 	}
-
 }
 
 species aez {
