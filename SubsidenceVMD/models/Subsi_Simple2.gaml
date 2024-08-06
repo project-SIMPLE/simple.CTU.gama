@@ -16,8 +16,8 @@ global {
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
 	field DEM <- copy(field(dem_file));
 	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ.tif");
-	float pixelSize <- 25.0;  //  500*500/10000 ha
-	float total_waterused <-0.0;
+	float pixelSize <- 25.0;  //  500*500/10000 ha  (ha)
+	float total_waterused <-0.0; //total water used 
 	//list<farming_unit> active_cell <- cell_dat where (each.grid_value != 8.0);
 	//	field flooding <- field(dem_file);
 	shape_file river_region0_shape_file <- shape_file("../includes/river_region.shp");
@@ -29,27 +29,26 @@ global {
 	
 	geometry shape <- envelope(volumeqp3_file);
 	//defining parameters
-	map<int,float> wu_cost;//<-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types
+	map<int,float> wu_cost;//(unit: m3/ha) <-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types 
+	float maxPumperVolume <- 10.0*30*3 ;  //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months
+	int totalNumberPumper <-1;
 	
 	
-	
-	
-
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
-		create GPlayLand from: players0_shape_file;
+		create GPlayLand from: players0_shape_file {
+			create Pumper number:1; 
+			create Lake number:1; 
+			create SluiceGate number:1; 			
+		}
 		create river from: river_region0_shape_file;
 		do load_WU_data;	
 		//do load_profile_adaptation;
 		total_waterused <- calWater_unit();
-		
-		
-		
 	}
 	reflex subsidence{
 		do subsidence;
 	}
-	
 	
 	// load map landuse :: water demand
 	action load_WU_data {
@@ -62,19 +61,21 @@ global {
 	}
 	// calculate total water unit of the data
 	float calWater_unit{
-		float tmpWu<-0.0;
+		float totalWu<-0.0;
 		ask LandCell {
-			tmpWu <- tmpWu + wu_cost[landuse]*pixelSize /1E6; // million m3 ;
+			totalWu <- totalWu + wu_cost[landuse]*pixelSize /1E6; // million m3 ;
 		}
-		return tmpWu;
+		return totalWu;
 	}
 	//subsidence 
-	action subsidence {
-		
+	action subsidence {		
 		loop cell_temp over: LandCell{		
-			cell_temp.waterExtracted<-wu_cost[cell_temp.landuse]*pixelSize /1E6;
+			// tam thoi gan luong nuoc bơm. Sẽ chỉnh lại lượng nwocs bơn tại vị trí của máy bơm lấy từ Game play
+			cell_temp.waterExtracted<- wu_cost[cell_temp.landuse]*pixelSize;  //m3  /1E6; 
+			
 			cell_temp.loseDepth<-cell_temp.waterExtracted/pixelSize;
-			cell_temp.loseDepth <-0.2; // fortesting 
+			cell_temp.loseDepth <-0.2; // for testing 
+			
 			if (DEM_subsidence[geometry(cell_temp).location] != -9999.0) {
 				DEM_subsidence[geometry(cell_temp).location]<- (DEM_subsidence[geometry(cell_temp).location]-cell_temp.loseDepth);
 			}
@@ -82,6 +83,29 @@ global {
 	}
 	
 
+}
+species Pumper {
+	
+	aspect default {
+		draw circle(10) color: #pink;
+	}
+	init {
+		
+	}
+
+}
+
+species Lake {
+	
+	aspect default {
+		draw rectangle(1.5,1) color:#blue border: #black;
+	}
+	}
+species SluiceGate {
+	
+	aspect default {
+		draw circle(20) color: #gray;
+	}
 }
 
 species river {
@@ -93,9 +117,18 @@ species river {
 }
 
 species GPlayLand {
-
+	list<Pumper> playerPumper;
+	list<Lake> playerLake;
+	list<SluiceGate> playerSluice;	
+	int numberPumper <-1;
+	int numberLake <-1; 
+	int numberSluice <-1;  
+	float volumePump <- 0.0;
 	aspect default {
 		draw shape.contour + 1000 color: #red;
+	}
+	reflex{
+		volumePump <- numberPumper * maxPumperVolume; 
 	}
 
 }
@@ -142,6 +175,10 @@ experiment main type: gui {
 		}
 		display "Subsidence - Groundwater extracted" type: 3d {
 			mesh DEM_subsidence scale:1000 color:scale([#darkblue::-7.5,#blue::-5,#lightblue::-2.5,#white::0,#green::1]) no_data: -9999.0 smooth: false;
+			species GPlayLand position: {0, 0, 0.01};
+			species Pumper;
+			species Lake;
+			species SluiceGate;
 //			graphics information{
 //			  draw "Scenario: " + currentScenario+ " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color:#black font:fonts[1];	
 //			} 

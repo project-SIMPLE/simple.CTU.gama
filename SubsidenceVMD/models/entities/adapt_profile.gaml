@@ -21,6 +21,6 @@ species district {
 	init {
 	}
 	aspect default{
-		draw shape empty:true border:#gray;
+	//	draw shape empty:true border:#gray;
 	}
 }
