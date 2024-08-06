@@ -16,46 +16,65 @@ global {
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
 	field DEM <- copy(field(dem_file));
 	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ.tif");
-	float pixelSize <- 25.0;  //  500*500/10000 ha  (ha)
+	float pixelSize <- 500*500;  //  500*500/10000 ha  (ha)
 	float total_waterused <-0.0; //total water used 
 	//list<farming_unit> active_cell <- cell_dat where (each.grid_value != 8.0);
 	//	field flooding <- field(dem_file);
 	shape_file river_region0_shape_file <- shape_file("../includes/river_region.shp");
 	field subsidentField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
 	field DEM_subsidence <- field(dem_file);
-	field groundwater1 <- field(volumeqh_file);
-	field groundwater2 <- field(volumeqp3_file);
-	field groundwater3 <- field(volumeqp23_file);
+	field groundwater1_qh <- field(volumeqh_file);
+	field groundwater2_pq3 <- field(volumeqp3_file);
+	field groundwater3_qp23 <- field(volumeqp23_file);
 	
 	geometry shape <- envelope(volumeqp3_file);
 	//defining parameters
 	map<int,float> wu_cost;//(unit: m3/ha) <-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types 
-	float maxPumperVolume <- 10.0*30*3 ;  //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months
+	float maxPumperVolumeHour <- 5 ;  //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months
 	int totalNumberPumper <-1;
+	float totalGroundVolumeUsed <-0.0;
 	
 	
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
-		create GPlayLand from: players0_shape_file {
+		create GPlayLand from: players0_shape_file with:[playerLand_ID::int(read('region'))]{
 			create Pumper number:1{
 				location <- any_location_in (myself.shape);
+				playerLand_ID<- myself.playerLand_ID;
 			}
 			create Lake number:1{
 				location <- any_location_in (myself.shape);
+				playerLand_ID<- myself.playerLand_ID;
 			}
 			create SluiceGate number:1{
 				location <- any_location_in (myself.shape);
+				playerLand_ID<- myself.playerLand_ID;
 			}			
 		}
 		create river from: river_region0_shape_file;
+//		do initGPLand;
 		do load_WU_data;	
 		//do load_profile_adaptation;
 		total_waterused <- calWater_unit();
+		//
 	}
 	reflex subsidence{
 		do subsidence;
 	}
-	
+	//init initGPLand
+//	action initGPLand{
+//		loop player_obj over: GPlayLand {
+//			ask Pumper overlapping player_obj {
+//				playerLand_ID<-  player_obj.playerLand_ID;
+//			}
+//			ask Lake overlapping player_obj {
+//				playerLand_ID<-  player_obj.playerLand_ID;
+//			}
+//			ask SluiceGate overlapping player_obj {
+//				playerLand_ID<-  player_obj.playerLand_ID;
+//			}
+//		}
+//	}
 	// load map landuse :: water demand
 	action load_WU_data {
 		matrix cb_matrix <- matrix(csv_file("../includes/water_need_landuse.csv", true));
@@ -74,24 +93,40 @@ global {
 		return totalWu;
 	}
 	//subsidence 
-	action subsidence {		
-		loop cell_temp over: LandCell{		
+	action subsidence {	
+		totalGroundVolumeUsed<-0.0;
+		float totalLosdepth<-0.0;
+		loop player_temp over: GPlayLand{	
 			// tam thoi gan luong nuoc bơm. Sẽ chỉnh lại lượng nwocs bơn tại vị trí của máy bơm lấy từ Game play
-			cell_temp.waterExtracted<- wu_cost[cell_temp.landuse]*pixelSize;  //m3  /1E6; 
-			
-			cell_temp.loseDepth<-cell_temp.waterExtracted/pixelSize;
-			cell_temp.loseDepth <-0.2; // for testing 
-			
-			if (DEM_subsidence[geometry(cell_temp).location] != -9999.0) {
-				DEM_subsidence[geometry(cell_temp).location]<- (DEM_subsidence[geometry(cell_temp).location]-cell_temp.loseDepth);
+			player_temp.volumePump <-player_temp.numberPumper * maxPumperVolumeHour*10*30*10;// volum hour * hour*days*months m3	
+			write "Pump volume of player "+	player_temp + ":"+ player_temp.volumePump;
+			ask LandCell overlapping player_temp{		
+				waterDemand<- wu_cost[landuse]*pixelSize;  //m3  /1E6; 
+				//waterExtracted<- player_temp.volumePump;
+				loseDepth<-player_temp.volumePump/pixelSize;  //m
+				//loseDepth <-0.2; // for testing 
+				if (DEM_subsidence[geometry(self).location] != -9999.0) {
+					DEM_subsidence[geometry(self).location]<- (DEM_subsidence[geometry(self).location]-loseDepth);
+				}
+				// update the ground water volume 
+				if (groundwater1_qh[geometry(self).location] != -9999.0){ // and  (groundwater1_qh[geometry(self).location] >0.0) 
+					groundwater1_qh[geometry(self).location]<- (groundwater1_qh[geometry(self).location]-(self.waterExtracted/1E6)); // Million m3
+				}
+				player_temp.volumePump <-player_temp.volumePump+waterExtracted;
+				totalLosdepth <- totalLosdepth+loseDepth;
 			}
-		}  		
+			totalGroundVolumeUsed <- totalGroundVolumeUsed+player_temp.volumePump/1E6;
+			
+		}  	
+//		write " Total lost depth:" + totalLosdepth;
+		write "Total ground water used:"+ totalGroundVolumeUsed;	
 	}
 	
 
 }
 species Pumper {
 	
+	int playerLand_ID;
 	aspect default {
 		draw circle(10) color: #pink;
 	}
@@ -102,13 +137,13 @@ species Pumper {
 }
 
 species Lake {
-	
+	int playerLand_ID;
 	aspect default {
 		draw rectangle(1.5,1) color:#blue border: #black;
 	}
 	}
 species SluiceGate {
-	
+	int playerLand_ID;
 	aspect default {
 		draw circle(20) color: #gray;
 	}
@@ -123,9 +158,10 @@ species river {
 }
 
 species GPlayLand {
-	list<Pumper> playerPumper;
-	list<Lake> playerLake;
-	list<SluiceGate> playerSluice;	
+	int playerLand_ID;
+//	list<Pumper> playerPumper;
+//	list<Lake> playerLake;
+//	list<SluiceGate> playerSluice;	
 	int numberPumper <-1;
 	int numberLake <-1; 
 	int numberSluice <-1;  
@@ -134,7 +170,7 @@ species GPlayLand {
 		draw shape.contour + 1000 color: #red;
 	}
 	reflex{
-		volumePump <- numberPumper * maxPumperVolume; 
+		volumePump <- numberPumper * maxPumperVolumeHour; 
 	}
 }
 
@@ -169,11 +205,11 @@ experiment main type: gui {
 				}
 			}
 		display "W1" type: 3d {
-			mesh groundwater1 smooth: false;
+			mesh groundwater1_qh smooth: false;
 			//mesh DEM color:depth_color scale:1000 no_data: -9999.0 smooth:true triangulation:false;
-			graphics information {
-							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-						}			
+//			graphics information {
+//							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
+//						}			
 			species aez;
 			species river;
 			species GPlayLand position: {0, 0, 0.01};
@@ -184,9 +220,9 @@ experiment main type: gui {
 			species Pumper;
 			species Lake;
 			species SluiceGate;
-//			graphics information{
-//			  draw "Scenario: " + currentScenario+ " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color:#black font:fonts[1];	
-//			} 
+			graphics information{
+			  draw "Scenario: " + currentScenario+ " Flood- min:" + min(DEM_subsidence) + " - max:" + max(DEM_subsidence) at: {0, 0} wireframe: true width: 2 color:#black font:fonts[1];	
+			} 
 		}
 		
 
