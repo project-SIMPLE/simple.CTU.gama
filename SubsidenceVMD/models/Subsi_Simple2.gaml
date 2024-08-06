@@ -8,25 +8,79 @@ global {
 	string currentScenario;
 	int _year <- 2018;
 	grid_file dem_file <- grid_file("../includes/DEM/dem_500x500_extendbound.tif");
-	grid_file dem_file1 <- grid_file("../includes/groundwater/1_volume_qh_500.tif");
-	grid_file dem_file2 <- grid_file("../includes/groundwater/2_volume_qp3_500.tif");
-	grid_file dem_file3 <- grid_file("../includes/groundwater/3_volume_qp23_500.tif");
-	field diffB1_M1_file <- field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
+	
+	grid_file volumeqh_file <- grid_file("../includes/groundwater/1_volume_qh_500.tif");
+	grid_file volumeqp3_file <- grid_file("../includes/groundwater/2_volume_qp3_500.tif");
+	grid_file volumeqp23_file <- grid_file("../includes/groundwater/3_volume_qp23_500.tif");
+	//field diffB1_M1_file <- field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
 	field DEM <- copy(field(dem_file));
+	file cell_file <- grid_file("../includes/ht2015_500x500_cutPQ.tif");
+	float pixelSize <- 25.0;  //  500*500/10000 ha
+	float total_waterused <-0.0;
+	//list<farming_unit> active_cell <- cell_dat where (each.grid_value != 8.0);
 	//	field flooding <- field(dem_file);
 	shape_file river_region0_shape_file <- shape_file("../includes/river_region.shp");
 	field subsidentField <- field(grid_file("../includes/Cum_subsidence/" + scenarioB + _year + ".tif"));
-	field groundwater1 <- field(dem_file1);
-	field groundwater2 <- field(dem_file2);
-	field groundwater3 <- field(dem_file3);
-	geometry shape <- envelope(dem_file2);
+	field DEM_subsidence <- field(dem_file);
+	field groundwater1 <- field(volumeqh_file);
+	field groundwater2 <- field(volumeqp3_file);
+	field groundwater3 <- field(volumeqp23_file);
+	
+	geometry shape <- envelope(volumeqp3_file);
+	//defining parameters
+	map<int,float> wu_cost;//<-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types
+	
+	
+	
+	
 
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
-		create land from: players0_shape_file;
+		create GPlayLand from: players0_shape_file;
 		create river from: river_region0_shape_file;
+		do load_WU_data;	
+		//do load_profile_adaptation;
+		total_waterused <- calWater_unit();
+		
+		
+		
 	}
+	reflex subsidence{
+		do subsidence;
+	}
+	
+	
+	// load map landuse :: water demand
+	action load_WU_data {
+		matrix cb_matrix <- matrix(csv_file("../includes/water_need_landuse.csv", true));
+		loop i from: 0 to: cb_matrix.rows - 1 {
+			int lu <- int(cb_matrix[0, i]);
+			wu_cost <+ (lu)::float(cb_matrix[2, i]); 
+		} 
+		write wu_cost;
+	}
+	// calculate total water unit of the data
+	float calWater_unit{
+		float tmpWu<-0.0;
+		ask LandCell {
+			tmpWu <- tmpWu + wu_cost[landuse]*pixelSize /1E6; // million m3 ;
+		}
+		return tmpWu;
+	}
+	//subsidence 
+	action subsidence {
+		
+		loop cell_temp over: LandCell{		
+			cell_temp.waterExtracted<-wu_cost[cell_temp.landuse]*pixelSize /1E6;
+			cell_temp.loseDepth<-cell_temp.waterExtracted/pixelSize;
+			cell_temp.loseDepth <-0.2; // fortesting 
+			if (DEM_subsidence[geometry(cell_temp).location] != -9999.0) {
+				DEM_subsidence[geometry(cell_temp).location]<- (DEM_subsidence[geometry(cell_temp).location]-cell_temp.loseDepth);
+			}
+		}  		
+	}
+	
 
 }
 
@@ -38,7 +92,7 @@ species river {
 
 }
 
-species land {
+species GPlayLand {
 
 	aspect default {
 		draw shape.contour + 1000 color: #red;
@@ -51,7 +105,17 @@ species aez {
 	aspect default {
 		draw shape.contour + 500 color: #gray;
 	}
-
+}
+grid LandCell file: cell_file neighbors: 8 {
+	int landuse <- int(grid_value);
+	float elevation;
+	float waterVolume;
+	float groundWaterDepth; // (Water volume/pixel_size ^2)
+	float waterDemand; 
+	float plantHealth; // plant die
+	float waterExtracted;//: Water volume - waterExtracted
+	float loseDepth; //: groundwater extracted is converted to water depth lose (WaterExtracted/pixelSize)	
+		
 }
 
 experiment main type: gui {
@@ -74,28 +138,35 @@ experiment main type: gui {
 						}			
 			species aez;
 			species river;
-			species land position: {0, 0, 0.01};
+			species GPlayLand position: {0, 0, 0.01};
 		}
+		display "Subsidence - Groundwater extracted" type: 3d {
+			mesh DEM_subsidence scale:1000 color:scale([#darkblue::-7.5,#blue::-5,#lightblue::-2.5,#white::0,#green::1]) no_data: -9999.0 smooth: false;
+//			graphics information{
+//			  draw "Scenario: " + currentScenario+ " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color:#black font:fonts[1];	
+//			} 
+		}
+		
 
-		display "W2" type: 3d {
-			mesh groundwater2 smooth: false;
-						graphics information {
-							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-						}
-			species aez;
-			species river;
-			species land position: {0, 0, 0.01};
-		}
-
-		display "W3" type: 3d {
-			mesh groundwater3 smooth: false;
-						graphics information {
-							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-						}
-			species aez;
-			species river;
-			species land position: {0, 0, 0.01};
-		}
+//		display "W2" type: 3d {
+//			mesh groundwater2 smooth: false;
+//						graphics information {
+//							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
+//						}
+//			species aez;
+//			species river;
+//			species GPlayLand position: {0, 0, 0.01};
+//		}
+//
+//		display "W3" type: 3d {
+//			mesh groundwater3 smooth: false;
+//						graphics information {
+//							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
+//						}
+//			species aez;
+//			species river;
+//			species GPlayLand position: {0, 0, 0.01};
+//		}
 
 	}
 
