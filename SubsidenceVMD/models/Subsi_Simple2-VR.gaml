@@ -53,8 +53,8 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	
-	action construction_message (string idP,string id,string iid, int x, int y, int z) {
-			write "" + idP+ " " + id + " " + x + " " + y + " " + z;
+	action construction_message (string idP,string id,int iid, int x, int y, int z) {
+			write "" + idP+ " |" + id + " |" + iid + " " + x + " " + y + " " + z;
 //		x <- (100 - x) * 1.6 + 10;
 //		y <- y * 1.8 + 100;
 		x<-x*100+first(unity_player where (each.name=idP)).myland.location.x;
@@ -179,7 +179,7 @@ species unity_player parent: abstract_unity_player {
 	float z_offset <- 2.0;
 
 	reflex ss {
-		location <- location + myland.location;
+		location <- (location*100) + myland.location;
 	}
 
 	aspect default {

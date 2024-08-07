@@ -42,20 +42,20 @@ global {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
 		create GPlayLand from: players0_shape_file with: [playerLand_ID::int(read('region'))] {
 			rot <- length(GPlayLand);
-//			create Pumper number: 1 {
-//				location <- any_location_in(myself.shape);
-//				playerLand_ID <- myself.playerLand_ID;
-//			}
-//
-//			create Lake number: 1 {
-//				location <- any_location_in(myself.shape);
-//				playerLand_ID <- myself.playerLand_ID;
-//			}
-//
-//			create SluiceGate number: 1 {
-//				location <- any_location_in(myself.shape);
-//				playerLand_ID <- myself.playerLand_ID;
-//			}
+			//			create Pumper number: 1 {
+			//				location <- any_location_in(myself.shape);
+			//				playerLand_ID <- myself.playerLand_ID;
+			//			}
+			//
+			//			create Lake number: 1 {
+			//				location <- any_location_in(myself.shape);
+			//				playerLand_ID <- myself.playerLand_ID;
+			//			}
+			//
+			//			create SluiceGate number: 1 {
+			//				location <- any_location_in(myself.shape);
+			//				playerLand_ID <- myself.playerLand_ID;
+			//			}
 
 		}
 
@@ -67,7 +67,7 @@ global {
 		//
 	}
 
-	reflex subsidence when:(cycle>0) and (cycle mod 50=0){
+	reflex subsidence when: (cycle > 0) and (cycle mod 50 = 0) {
 		do subsidence;
 	}
 	//init initGPLand
@@ -92,7 +92,7 @@ global {
 			wu_cost <+ (lu)::float(cb_matrix[2, i]);
 		}
 
-//		write wu_cost;
+		//		write wu_cost;
 	}
 	// calculate total water unit of the data
 	float calWater_unit {
@@ -110,7 +110,7 @@ global {
 		loop player_temp over: GPlayLand {
 		// tam thoi gan luong nuoc bơm. Sẽ chỉnh lại lượng nwocs bơn tại vị trí của máy bơm lấy từ Game play
 			player_temp.volumePump <- player_temp.numberPumper * maxPumperVolumeHour * 10 * 30 * 10; // volum hour * hour*days*months m3	
-//			write "Pump volume of player " + player_temp + ":" + player_temp.volumePump;
+			//			write "Pump volume of player " + player_temp + ":" + player_temp.volumePump;
 			ask LandCell overlapping player_temp {
 				waterDemand <- wu_cost[landuse] * pixelSize; //m3  /1E6; 
 				//waterExtracted<- player_temp.volumePump;
@@ -131,11 +131,10 @@ global {
 			totalGroundVolumeUsed <- totalGroundVolumeUsed + player_temp.volumePump / 1E6;
 		}
 		//		write " Total lost depth:" + totalLosdepth;
-//		write "Total ground water used:" + totalGroundVolumeUsed;
+		//		write "Total ground water used:" + totalGroundVolumeUsed;
 	}
 
 }
-
 
 species enemy {
 	string _id;
@@ -171,14 +170,14 @@ species warning {
 	}
 
 }
+
 species Pumper {
 	int playerLand_ID;
-
 	string _id;
+
 	aspect default {
-//		draw circle(10) color: #pink;
-				draw ipumper border: #red size: 1000;
-		
+	//		draw circle(10) color: #pink;
+		draw ipumper border: #red size: 1000;
 	}
 
 	init {
@@ -188,26 +187,22 @@ species Pumper {
 
 species Lake {
 	int playerLand_ID;
-
-
 	string _id;
-	aspect default {
-//		draw rectangle(1.5, 1) color: #blue border: #black;
-		draw ilake border: #red size: 1000;
 
+	aspect default {
+	//		draw rectangle(1.5, 1) color: #blue border: #black;
+		draw ilake border: #red size: 1000;
 	}
 
 }
 
 species SluiceGate {
 	int playerLand_ID;
-
-
 	string _id;
-	aspect default {
-//		draw circle(20) color: #gray;
-		draw igate border: #red size: 1000;
 
+	aspect default {
+	//		draw circle(20) color: #gray;
+		draw igate border: #red size: 1000;
 	}
 
 }
@@ -242,7 +237,7 @@ species GPlayLand {
 	bool active <- false;
 
 	aspect land2d {
-		draw sland at:location size:10000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
+		draw sland at: location size: 10000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
 	}
 
 }
