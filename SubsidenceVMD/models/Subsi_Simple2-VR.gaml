@@ -49,16 +49,17 @@ species unity_linker parent: abstract_unity_linker {
 
 	//action that will be called by the Unity player to send a message to the GAMA simulation
 	action receive_message (string id, string mes) {
-		write "Player " + id + " send the message: " + mes;
+//		write "Player " + id + " send the message: " + mes;
 	}
 	
 	
 	action construction_message (string idP,string id,int iid, int x, int y, int z) {
-			write "" + idP+ " |" + id + " |" + iid + " " + x + " " + y + " " + z;
+//			write "" + idP+ " |" + id + " |" + iid + " " + x + " " + y + " " + z;
 //		x <- (100 - x) * 1.6 + 10;
 //		y <- y * 1.8 + 100;
-		x<-x*100+first(unity_player where (each.name=idP)).myland.location.x;
-		y<-y*100+first(unity_player where (each.name=idP)).myland.location.y;
+		unity_player Pl<-first(unity_player where (each.name=idP));
+		x<-x*100+Pl.myland.location.x;
+		y<-y*100+Pl.myland.location.y;
 		if (id contains "Coconut" or id contains "Banana" or id contains "Rice") {
 			tree t <- first(tree where (each._id = iid));
 			if (t != nil) {
@@ -120,6 +121,8 @@ species unity_linker parent: abstract_unity_linker {
 			} else {
 				create Pumper {
 					_id <- iid;
+					playerLand_ID<- Pl.myland.playerLand_ID;
+					Pl.myland.playerPumper<<self;
 					location <- {x, y};
 				}
 
@@ -197,7 +200,7 @@ species unity_player parent: abstract_unity_player {
 }
 
 experiment vr_xp autorun: false type: unity {
-	float minimum_cycle_duration <- 0.05;
+	float minimum_cycle_duration <- 0.01;
 	string unity_linker_species <- string(unity_linker);
 	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
 	float t_ref;
