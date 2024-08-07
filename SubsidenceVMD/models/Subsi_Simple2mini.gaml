@@ -73,7 +73,7 @@ global {
 		//
 	}
 
-	reflex mainReflex when: (cycle > 0) and (cycle mod 500 = 0) {
+	reflex mainReflex when: (cycle > 0) and (cycle mod 700 = 0) {
 		do updateSubsidenceAquifer;
 		do readVR;
 		//				do adding_contrucsion;		
@@ -162,7 +162,7 @@ global {
 							player_temp.cntDem <- player_temp.cntDem + 1;
 						}
 
-						if (player_temp.cntDem > 10) {
+						if (player_temp.cntDem > 100) {
 							player_temp.subside <- true;
 						}
 
