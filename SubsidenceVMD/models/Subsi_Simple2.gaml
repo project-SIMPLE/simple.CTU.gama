@@ -12,7 +12,7 @@ global {
 	grid_file volumeqh_file <- grid_file("../includes/groundwater/1_volume_qh_500.tif");
 	grid_file volumeqp3_file <- grid_file("../includes/groundwater/2_volume_qp3_500.tif");
 	//grid_file volumeqp23_file <- grid_file("../includes/groundwater/3_volume_qp23_500.tif");
-	grid_file subsidence_file <- grid_file("../includes/Cum_subsidence/B1/B1_2018.tif");
+	grid_file subsidence2018_file <- grid_file("../includes/Cum_subsidence/B1/B1_2018.tif");
 	//field diffB1_M1_file <- field(grid_file("../includes/Cum_subsidence/diff_B1_M1.tif"));
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
 	field DEM <- copy(field(dem_file));
@@ -27,6 +27,7 @@ global {
 	field groundwater1_qh <- field(volumeqh_file);
 	field groundwater2_qp3 <- field(volumeqp3_file);
 	//field groundwater3_qp23 <- field(volumeqp23_file);
+	field subsidence2018 <-  field(subsidence2018_file);
 	
 	geometry shape <- envelope(volumeqp3_file);
 	//defining parameters
