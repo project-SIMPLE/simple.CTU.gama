@@ -10,7 +10,15 @@ global {
 	}
 
 	action readVR {
-		write "xxxx";
+		ask GPlayLand where (each.subside) {
+			unity_player u <- first(unity_player where (each.myland = self));
+//			write "" + u;
+			ask unity_linker {
+				do send_message players: u as list mes: ["subside"::true];
+			}
+
+		}
+
 	}
 
 }
@@ -200,6 +208,8 @@ species unity_player parent: abstract_unity_player {
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
+		myland.cntDem <- 0;
+		myland.subside <- false;
 		myland.active <- true;
 		do Restart(myland.playerLand_ID);
 	}
@@ -235,6 +245,7 @@ species unity_player parent: abstract_unity_player {
 	float z_offset <- 2.0;
 
 	reflex ss {
+		heading<--heading;
 		location <- (location * 100) + myland.location;
 	}
 
@@ -276,7 +287,7 @@ experiment vr_xp autorun: false type: unity {
 	}
 
 	output {
-		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: true tabs: false editors: false;
+		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: false tabs: false editors: false;
 		display "Subsidence - Groundwater extracted1" type: 3d background: #black axes: false {
 			camera 'default' location: {243237.2195, 132619.9172, 310954.9886} target: {243237.2195, 132614.49, 0.0};
 			mesh SubsidenceCell scale: 1000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: false;
@@ -289,13 +300,13 @@ experiment vr_xp autorun: false type: unity {
 		display "P1" background: #black type: 3d axes: false {
 			camera 'default' location: {327596.9917, 58818.3336, 12993.7722} target: {327596.9917, 58818.1068, 0.0};
 			species GPlayLand aspect: land2d;
-			species unity_player;
 			species tree;
 			species SluiceGate;
 			species Lake;
 			species warning;
 			species Pumper;
 			species enemy;
+			species unity_player transparency:0.5;
 			//			 event #mouse_down{
 			//				 float t <- gama.machine_time;
 			//				 if (t - t_ref) > 500 {
@@ -352,7 +363,7 @@ experiment vr_xp autorun: false type: unity {
 		display "P4" background: #black type: 3d axes: false {
 			camera 'default' location: {177075.0127, 170800.2633, 16212.9341} target: {177075.0127, 170799.9803, 0.0};
 			species GPlayLand aspect: land2d;
-			species unity_player;
+			species unity_player transparency:0.5;
 			species tree;
 			species SluiceGate;
 			species Lake;

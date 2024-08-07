@@ -73,7 +73,7 @@ global {
 		//
 	}
 
-	reflex mainReflex when: (cycle > 0) and (cycle mod 100 = 0) {
+	reflex mainReflex when: (cycle > 0) and (cycle mod 500 = 0) {
 		do updateSubsidenceAquifer;
 		do readVR;
 		//				do adding_contrucsion;		
@@ -157,6 +157,15 @@ global {
 						elevation <- elevation - rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
 						//cấu trúc lệnh này ko chạy đc: SubsidenceCell[self.grid_x, self.grid_y].elevation<- SubsidenceCell[self.grid_x, self.grid_y].elevation -tmpDepthLose; // Million m3
 						grid_value <- elevation;
+						//						write grid_value;
+						if (grid_value < -0.01) {
+							player_temp.cntDem <- player_temp.cntDem + 1;
+						}
+
+						if (player_temp.cntDem > 10) {
+							player_temp.subside <- true;
+						}
+
 					}
 
 				} // end update subsidence at pumper
@@ -279,9 +288,11 @@ species GPlayLand {
 	list<Pumper> VRPumper;
 	list<Lake> VRLake;
 	list<SluiceGate> VRSluice;
+	bool subside <- false;
+	int cntDem <- 0;
 	int numberPumper <- 1;
 	int numberLake <- 1;
-	int numberSluice <- 10;
+	int numberSluice <- 1;
 	float volumePump <- 0.0;
 
 	aspect default {
