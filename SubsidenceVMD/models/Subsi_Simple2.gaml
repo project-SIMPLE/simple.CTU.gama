@@ -125,24 +125,28 @@ global {
 			tmpDepthLose<-player_temp.volumePump/pixelSize;  //m
 			ask player_temp.playerPumper {
 				Pumper tmpPumper <- self;
+				float rateSubsi <-1.0;
 				ask SubsidenceCell overlapping self { // update subsi at Pumper
 					ask self neighbors_at 6{
 						ask AquiferQHCell[self.grid_x, self.grid_y]{
-							if (volume>0){ 
-								write "Volum QH:" +volume;
+							if (volume - (player_temp.volumePump/1000000))>0{ 
+//								write "Volum QH:" +volume;
 								volume <- volume - (player_temp.volumePump/1000000);
 								grid_value <- volume;
+								rateSubsi <- 1.0;
 							}
 							else{
 								ask AquiferQP3Cell[self.grid_x, self.grid_y]{
-										write "Volum QP3:" +volume;
+//										write "Volum QP3:" +volume;
 										volume <- volume - (player_temp.volumePump/1000000);
 										grid_value <- volume;
+										rateSubsi <- 1.05;
 								}
 							} 
 						}
 						//lose elevation = subsidence rate of aquifer * depth lose . 
-						elevation <- elevation - rateSubsidence[tmpPumper.aquifer] *tmpDepthLose;
+						
+						elevation <- elevation - rateSubsi*tmpDepthLose;
 						//cấu trúc lệnh này ko chạy đc: SubsidenceCell[self.grid_x, self.grid_y].elevation<- SubsidenceCell[self.grid_x, self.grid_y].elevation -tmpDepthLose; // Million m3
 						grid_value <- elevation;
 					}
