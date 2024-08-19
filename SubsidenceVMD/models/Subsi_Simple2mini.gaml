@@ -50,19 +50,22 @@ global {
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
 		create GPlayLand from: players0_shape_file with: [playerLand_ID::int(read('region'))] {
-		//					create Pumper number:1{
-		//						location <- any_location_in (myself.shape);
-		//						playerLand_ID<- myself.playerLand_ID;
-		//						myself.playerPumper<<self;
-		//					}
-		//					create Lake number:1{
-		//						location <- any_location_in (myself.shape);
-		//						playerLand_ID<- myself.playerLand_ID;
-		//					}
-		//					create SluiceGate number:1{
-		//						location <- any_location_in (myself.shape);
-		//						playerLand_ID<- myself.playerLand_ID;
-		//					}			
+		//			create Pumper number: 1 {
+		//				location <- any_location_in(myself.shape);
+		//				playerLand_ID <- myself.playerLand_ID;
+		//				myself.playerPumper << self;
+		//			}
+		//
+		//			create Lake number: 1 {
+		//				location <- any_location_in(myself.shape);
+		//				playerLand_ID <- myself.playerLand_ID;
+		//			}
+		//
+		//			create SluiceGate number: 1 {
+		//				location <- any_location_in(myself.shape);
+		//				playerLand_ID <- myself.playerLand_ID;
+		//			}
+
 		}
 
 		create river from: river_region0_shape_file;
@@ -73,10 +76,10 @@ global {
 		//
 	}
 
-	reflex mainReflex when: (cycle > 0) and (cycle mod 700 = 0) {
+	reflex mainReflex when: (cycle > 0) and (cycle mod 2000 = 0) {
 		do updateSubsidenceAquifer;
 		do readVR;
-		//				do adding_contrucsion;		
+		//		do adding_contrucsion;
 	}
 
 	action adding_contrucsion {
@@ -156,13 +159,13 @@ global {
 						//lose elevation = subsidence rate of aquifer * depth lose . 
 						elevation <- elevation - rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
 						//cấu trúc lệnh này ko chạy đc: SubsidenceCell[self.grid_x, self.grid_y].elevation<- SubsidenceCell[self.grid_x, self.grid_y].elevation -tmpDepthLose; // Million m3
-						grid_value <- elevation;
+						grid_value <- (elevation < -9999) ? grid_value : elevation;
 						//						write grid_value;
-						if (grid_value < -0.01) {
+						if (grid_value < -0.0001) {
 							player_temp.cntDem <- player_temp.cntDem + 1;
 						}
 
-						if (player_temp.cntDem > 100) {
+						if (player_temp.cntDem > 50000) {
 							player_temp.subside <- true;
 						}
 
@@ -173,7 +176,8 @@ global {
 				ask player_temp.playerSluicegate {
 					ask SubsidenceCell overlapping self {
 						ask self neighbors_at 6 {
-							elevation <- elevation - rateSubsidence['sluice'] * tmpDepthLose;
+							float tmp <- elevation - rateSubsidence['sluice'] * tmpDepthLose;
+							elevation <- (tmp < -9999) ? elevation : tmp;
 						}
 
 					}
@@ -204,7 +208,7 @@ species tree {
 	int playerLand_ID;
 
 	aspect default {
-		draw itree size: 1000;
+		draw itree size: 300;
 	}
 
 }
@@ -307,7 +311,8 @@ species GPlayLand {
 	bool active <- false;
 
 	aspect land2d {
-		draw sland at: location size: 10000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
+		draw sland at: location+{1000,0,0} size: 12000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
+//		draw "Dead Trees:"+length(tree where !dead(each)) at: location+{1000,0,0} size:10;
 	}
 
 }
@@ -352,13 +357,13 @@ experiment main type: gui {
 	list<rgb> flood_color <- palette([#white, #blue]);
 	list<rgb> depth_color <- palette([#grey, #black]);
 	output {
-	//		display "Digital Elevation Model" type: 3d {
-	//			mesh DEM color: depth_color scale: 1000 no_data: -9999.0 smooth: true triangulation: false;
-	//			graphics information {
-	//				draw "DEM (" + _year + ") min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-	//			}
-	//
-	//		}
+	//			display "Digital Elevation Model" type: 3d {
+	//				mesh DEM color: depth_color scale: 10000 no_data: -9999.0 smooth: true triangulation: true;
+	//				graphics information {
+	//					draw "DEM (" + _year + ") min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
+	//				}
+	//	
+	//			}s
 	//
 	//		display "Water_qh" type: 3d {
 	//			mesh AquiferQHCell smooth: false;
@@ -372,7 +377,7 @@ experiment main type: gui {
 	//		}
 	//
 		display "Subsidence - Groundwater extracted" type: 3d {
-			mesh SubsidenceCell scale: 1000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: false;
+			mesh SubsidenceCell scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
 			species GPlayLand position: {0, 0, 0.01};
 			species Pumper;
 			species Lake;

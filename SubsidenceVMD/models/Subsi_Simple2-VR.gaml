@@ -65,13 +65,14 @@ species unity_linker parent: abstract_unity_linker {
 	}
 
 	action construction_message (string idP, string id, int iid, int x, int y, int z) {
+//		write "" + id;
 	//			write "" + idP+ " |" + id + " |" + iid + " " + x + " " + y + " " + z;
 	//		x <- (100 - x) * 1.6 + 10;
 	//		y <- y * 1.8 + 100;
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		x <- x * 100 + Pl.myland.location.x;
 		y <- y * 100 + Pl.myland.location.y;
-		if (id contains "Coconut" or id contains "Banana" or id contains "Rice") {
+		if (id contains "Coconut" or id contains "Banana" or id contains "Orange") {
 			tree t <- first(tree where (each._id = iid));
 			if (t != nil) {
 				ask t {
@@ -182,6 +183,38 @@ species unity_linker parent: abstract_unity_linker {
 
 	}
 
+	action DeletePlayer (string idP, string id, int iid) {
+//			write "" + id  ; 
+		if (id contains "Coconut" or id contains "Banana" or id contains "Orange") {
+			tree t <- first(tree where (each._id = iid));
+			if (t != nil) {
+				ask t {
+					do die;
+				}
+
+			}
+
+		}
+
+		if (id contains "SpawnEnemy") {
+			ask warning {
+				do die;
+			} 
+
+		}
+
+		if (id contains "SaltyWater(Clone)") {
+			enemy t <- first(enemy where (each._id = iid));
+			if (t != nil) {
+				ask t {
+					do die;
+				}
+
+			}
+
+		}
+
+	}
 	action define_properties {
 		unity_aspect geom_aspect <- geometry_aspect(10.0, #gray, precision);
 		up_geom <- geometry_properties("block", "selectable", geom_aspect, #ray_interactable, false);
@@ -208,6 +241,7 @@ species unity_player parent: abstract_unity_player {
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
+		write myland;
 		myland.cntDem <- 0;
 		myland.subside <- false;
 		myland.active <- true;
@@ -287,7 +321,7 @@ experiment vr_xp autorun: false type: unity {
 	}
 
 	output {
-		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: false tabs: false editors: false;
+		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: true tabs: false editors: false;
 		display "Subsidence - Groundwater extracted1" type: 3d background: #black axes: false {
 			camera 'default' location: {243237.2195, 132619.9172, 310954.9886} target: {243237.2195, 132614.49, 0.0};
 			mesh SubsidenceCell scale: 1000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: false;
@@ -303,7 +337,7 @@ experiment vr_xp autorun: false type: unity {
 			species tree;
 			species SluiceGate;
 			species Lake;
-			species warning;
+			species warning  position: {0, 0, 0.1};
 			species Pumper;
 			species enemy;
 			species unity_player transparency:0.5;
@@ -319,7 +353,7 @@ experiment vr_xp autorun: false type: unity {
 		}
 
 		display "P2" background: #black type: 3d axes: false {
-			camera 'default' location: {317651.54, 108884.3533, 14181.7295} target: {317651.54, 108884.1058, 0.0};
+			camera 'default' location: {317651.54,108884.4166,17807.3996} target: {317651.54,108884.1058,0.0};
 			species GPlayLand aspect: land2d;
 			species unity_player;
 			species tree;
@@ -340,7 +374,7 @@ experiment vr_xp autorun: false type: unity {
 		}
 
 		display "P3" background: #black type: 3d axes: false {
-			camera 'default' location: {264110.5481, 148732.5989, 15154.0309} target: {264110.5481, 148732.3344, 0.0};
+			camera 'default' location: {264110.5481,148732.6871,20206.4384} target: {264110.5481,148732.3344,0.0};
 			species GPlayLand aspect: land2d;
 			species unity_player;
 			species tree;
@@ -361,7 +395,7 @@ experiment vr_xp autorun: false type: unity {
 		}
 
 		display "P4" background: #black type: 3d axes: false {
-			camera 'default' location: {177075.0127, 170800.2633, 16212.9341} target: {177075.0127, 170799.9803, 0.0};
+			camera 'default' location: {177075.0127,170800.3465,20978.6759} target: {177075.0127,170799.9803,0.0};
 			species GPlayLand aspect: land2d;
 			species unity_player transparency:0.5;
 			species tree;
