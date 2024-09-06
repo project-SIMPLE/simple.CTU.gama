@@ -352,6 +352,68 @@ experiment vr_xp autorun: false type: unity {
 			//			 }
 		}
 
+		display "P2" background: #black type: 3d axes: false {
+			camera 'default' location: {317651.54,108884.4166,17807.3996} target: {317651.54,108884.1058,0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
+
+		display "P3" background: #black type: 3d axes: false {
+			camera 'default' location: {264110.5481,148732.6871,20206.4384} target: {264110.5481,148732.3344,0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
+
+		display "P4" background: #black type: 3d axes: false {
+			camera 'default' location: {177075.0127,170800.3465,20978.6759} target: {177075.0127,170799.9803,0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player transparency:0.5;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
 
 	}
 

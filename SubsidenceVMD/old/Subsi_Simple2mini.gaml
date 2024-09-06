@@ -50,11 +50,11 @@ global {
 	init {
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
 		create GPlayLand from: players0_shape_file with: [playerLand_ID::int(read('region'))] {
-					create Pumper number: 1 {
-						location <- any_location_in(myself.shape);
-						playerLand_ID <- myself.playerLand_ID;
-						myself.playerPumper << self;
-					}
+		//			create Pumper number: 1 {
+		//				location <- any_location_in(myself.shape);
+		//				playerLand_ID <- myself.playerLand_ID;
+		//				myself.playerPumper << self;
+		//			}
 		//
 		//			create Lake number: 1 {
 		//				location <- any_location_in(myself.shape);
@@ -79,7 +79,7 @@ global {
 	reflex mainReflex when: (cycle > 0) and (cycle mod 2000 = 0) {
 		do updateSubsidenceAquifer;
 		do readVR;
-				do adding_contrucsion;
+		//		do adding_contrucsion;
 	}
 
 	action adding_contrucsion {
