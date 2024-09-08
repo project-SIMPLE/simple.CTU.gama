@@ -79,7 +79,7 @@ global {
 	reflex mainReflex when: (cycle > 0) and (cycle mod 2000 = 0) {
 		do updateSubsidenceAquifer;
 		do readVR;
-		//		do adding_contrucsion;
+//				do adding_contrucsion;
 	}
 
 	action adding_contrucsion {
