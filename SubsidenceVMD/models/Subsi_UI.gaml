@@ -36,7 +36,7 @@ global {
 			//			}
 			//
 			//			create SluiceGate number: 1 {
-			//				location <- any_location_in(myself.shape);
+	 		//				location <- any_location_in(myself.shape);
 			//				playerLand_ID <- myself.playerLand_ID;
 			//			}
 
@@ -47,7 +47,7 @@ global {
 		//
 	}
 
-	reflex mainReflex when: (cycle > 0) and (cycle mod 100 = 0) {
+	reflex mainReflex when: (cycle > 0) and (cycle mod 50 = 0) {
 		create enemy {
 			location <- any(route_source);
 			target <- route_target;
@@ -136,7 +136,7 @@ experiment main1 type: gui {
 			species enemy;
 			species freshwater;
 			species tree;
-			species route;
+//			species route;
 			//			graphics information {
 			//				draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM_subsidence) + " - max:" + max(DEM_subsidence) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
 			//			}

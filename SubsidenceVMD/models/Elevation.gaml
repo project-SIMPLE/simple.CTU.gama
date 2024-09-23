@@ -76,7 +76,7 @@ species enemy skills: [moving] {
 	reflex move {
 	//we use the return_path facet to return the path followed
 		do goto target: target on: road_network recompute_path: false return_path: false speed: 50.0;
-		if (location distance_to target <100) {
+		if (location distance_to target <10) {
 			do die;
 		}
 
@@ -93,8 +93,8 @@ species freshwater skills: [moving] {
 	int playerLand_ID;
 	enemy target;
 
-	reflex chose when: target = nil {
-		target <- (enemy where (!each.spotted)) closest_to self;
+	reflex chose when: target = nil or dead(target) {
+		target <- ((enemy at_distance 7000) where (!each.spotted)) closest_to self;
 		if(target!=nil){
 			target.spotted<-true;
 		}else{
@@ -103,16 +103,13 @@ species freshwater skills: [moving] {
 	}
 
 	reflex move {
-		if dead(target) {
-			target <- nil;
-		} else {
-			do goto target: target.location on: road_network recompute_path: true speed: 100.0;
-			if (location = target) {
+		 
+			do goto target: target.location on: road_network recompute_path: true speed: 70.0;
+			if (location distance_to target<10) {
 				ask target{do die;}
 				do die;
 			}
-
-		}
+ 
 
 	}
 
@@ -128,7 +125,7 @@ species Pumper parent: DraggedAgent {
 	string _id;
 	string aquifer; // 'qh', 'qp3'
 	geometry shape <- square(1000);
-	int rndstart<-500+rnd(5)*2000;
+	int rndstart<-100+int(self)*50;
 	aspect default {
 		draw cube(1000) texture: ipumper;
 		//		draw shape color:#red;
