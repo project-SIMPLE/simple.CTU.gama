@@ -13,20 +13,20 @@ global {
 	image_file iwarning <- image_file("../includes/warn.png");
 	shape_file routes0_shape_file <- shape_file("../includes/routes.shp");
 	int fsize<-100;
-	field SubsidenceCell_elevation <- field(100,100);
+	field SubsidenceCell_elevation <- field(fsize,fsize);
 	field SubsidenceCell_gridvalue <- copy(SubsidenceCell_elevation);
-	field AquiferQHCell_volume <- field(fsize,fsize);
-	field AquiferQHCell_groundWaterDepth <- copy(AquiferQHCell_volume);
-	field AquiferQP3Cell_volume <- field(fsize,fsize);
-	field AquiferQP3Cell_groundWaterDepth <- copy(AquiferQP3Cell_volume);
+//	field AquiferQHCell_volume <- field(fsize,fsize);
+//	field AquiferQHCell_groundWaterDepth <- copy(AquiferQHCell_volume);
+//	field AquiferQP3Cell_volume <- field(fsize,fsize);
+//	field AquiferQP3Cell_groundWaterDepth <- copy(AquiferQP3Cell_volume);
 
 	field subsidence2018 <- field(fsize,fsize);
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
-	float pixelSize <- 500.0 * 500.0; //  500*500/10000 ha  (ha)
+	float pixelSize <- fsize*fsize ; //  500*500/10000 ha  (ha)
 	float total_waterused <- 0.0; //total water used 
 	shape_file river_region0_shape_file <- shape_file("../includes/river_region.shp");
 	geometry shape <- envelope(players0_shape_file);
-	map<int, float> wu_cost; //(unit: m3/ha) <-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types 
+//	map<int, float> wu_cost; //(unit: m3/ha) <-[5::34,34::389,12::180,6::98,14::294,101::150];//waterused of GPlayLanduse types 
 	// para of Pumper 
 	float pumVolumeHour <- 5.0; //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months
 	float pumHourperDay <- 6.0;
@@ -58,23 +58,33 @@ global {
 	//
 	//		}
 		create river from: river_region0_shape_file;
-		do load_WU_data;
+//		do load_WU_data;
 	}
 
-//	reflex mainReflex2 {
+	reflex mainReflex2 {
+
+		do updateSubsidenceAquifer;
+//		diffuse var:cc on:SubsidenceCell_elevation;
 //		do updateSubsidenceAquifer;
-//	}
+
+		//ask all cells to decrease their level of pollution 
+	
+		//diffuse the pollutions to neighbor cells
+//		diffuse var: pollution on: SubsidenceCell_elevation proportion: 0.009;
+			diffuse var: phero on: SubsidenceCell_elevation  proportion: 1 ;
+		
+	}
 
 	// load map landuse :: water demand
-	action load_WU_data {
-		matrix cb_matrix <- matrix(csv_file("../includes/water_need_landuse.csv", true));
-		loop i from: 0 to: cb_matrix.rows - 1 {
-			int lu <- int(cb_matrix[0, i]);
-			wu_cost <+ (lu)::float(cb_matrix[2, i]);
-		}
-
-		//		write wu_cost;
-	}
+//	action load_WU_data {
+//		matrix cb_matrix <- matrix(csv_file("../includes/water_need_landuse.csv", true));
+//		loop i from: 0 to: cb_matrix.rows - 1 {
+//			int lu <- int(cb_matrix[0, i]);
+//			wu_cost <+ (lu)::float(cb_matrix[2, i]);
+//		}
+//
+//		//		write wu_cost;
+//	}
 
 	// subsidence at radius 3 cell around Pumper
 	action updateSubsidenceAquifer {
@@ -88,25 +98,23 @@ global {
 			ask player_temp.playerPumper {
 				Pumper tmpPumper <- self;
 				loop s over: mysub { // update subsi at Pumper 
-					if (AquiferQHCell_volume[geometry(s).location] > 0) {
-						AquiferQHCell_volume[geometry(s).location] <- AquiferQHCell_volume[geometry(s).location] - (player_temp.volumePump / 1000000);
-					} else {
-						AquiferQP3Cell_volume[geometry(s).location] <- AquiferQP3Cell_volume[geometry(s).location] - (player_temp.volumePump / 1000000);
-					}
+//					if (AquiferQHCell_volume[geometry(s).location] > 0) {
+//						AquiferQHCell_volume[geometry(s).location] <- AquiferQHCell_volume[geometry(s).location] - (player_temp.volumePump * 1000000);
+//					} else {
+//						AquiferQP3Cell_volume[geometry(s).location] <- AquiferQP3Cell_volume[geometry(s).location] - (player_temp.volumePump * 1000000);
+//					}
 
 					//						}
 					//lose elevation = subsidence rate of aquifer * depth lose . 
-					SubsidenceCell_elevation[geometry(s).location] <- SubsidenceCell_elevation[geometry(s).location] - rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
-					SubsidenceCell_gridvalue[geometry(s).location] <- (SubsidenceCell_elevation[geometry(s).location] < -9999) ?
-					SubsidenceCell_gridvalue[geometry(s).location] : SubsidenceCell_elevation[geometry(s).location];
-					//						write grid_value;
-					if (SubsidenceCell_gridvalue[geometry(s).location] < -0.0001) {
-						player_temp.cntDem <- player_temp.cntDem + 1;
-					}
-
-					if (player_temp.cntDem > 50000) {
-						player_temp.subside <- true;
-					}
+					SubsidenceCell_elevation[geometry(s).location] <- SubsidenceCell_elevation[geometry(s).location] +100;// rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
+ 					//						write grid_value;
+//					if (SubsidenceCell_gridvalue[geometry(s).location] < -0.0001) {
+//						player_temp.cntDem <- player_temp.cntDem + 1;
+//					}
+//
+//					if (player_temp.cntDem > 50000) {
+//						player_temp.subside <- true;
+//					}
 
 					//					}
 
@@ -116,13 +124,13 @@ global {
 
 			}
 
-			ask player_temp.playerPumper {
-				loop s over: mysub {
-					float tmp <- SubsidenceCell_elevation[geometry(s).location] - rateSubsidence['sluice'] * tmpDepthLose;
-					SubsidenceCell_elevation[geometry(s).location] <- (tmp < -9999) ? SubsidenceCell_elevation[geometry(s).location] : tmp;
-				}
-
-			}
+//			ask player_temp.playerPumper {
+//				loop s over: mysub {
+//					float tmp <- SubsidenceCell_elevation[geometry(s).location] - rateSubsidence['sluice'] * tmpDepthLose;
+//					SubsidenceCell_elevation[geometry(s).location] <-   tmp;
+//				}
+//
+//			}
 
 			totalGroundVolumeUsed <- totalGroundVolumeUsed + player_temp.volumePump / 1E6;
 		} // and loop

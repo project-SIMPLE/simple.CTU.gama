@@ -1,5 +1,5 @@
 model LoadSubsi
-
+ 
 import "Elevation.gaml"
 
 global {
@@ -45,9 +45,7 @@ global {
 		}
 
 		road_network <- as_edge_graph(route);
-		create river from: river_region0_shape_file;
-		//		do initGPLand;
-		do load_WU_data;
+		create river from: river_region0_shape_file; 
 		//
 	}
 
@@ -56,8 +54,6 @@ global {
 			location <- any(route_source);
 			target <- route_target;
 		}
-
-		do updateSubsidenceAquifer;
 	}
 
 	action mouse_up {
@@ -148,7 +144,7 @@ experiment main1 type: gui {
 
 		display "Groundwater extracted" type: 3d background: #black {
 		//					camera 'default' location: {183000.0, 410250.0, 0.0} target: {183000.0, 136750.0, 0.0};
-			mesh SubsidenceCell_elevation scale: 100 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
+			mesh SubsidenceCell_elevation scale: -1 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
 			//			species GPlayLand position: {0, 0, 0.01};
 			species Pumper;
 		}
