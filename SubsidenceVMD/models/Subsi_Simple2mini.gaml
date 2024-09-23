@@ -61,25 +61,13 @@ global {
 		}
 
 		create river from: river_region0_shape_file;
-		//		do initGPLand;
 		do load_WU_data;
-		//do load_profile_adaptation;
-//		total_waterused <- calWater_unit();
-		//
+
 	}
 
 	reflex mainReflex {
 		do updateSubsidenceAquifer;
-		//		ask GPlayLand {
-		//		//create the list of construction read from VRGame
-		//		/*create constrction from VRPumper */
-		//			create Pumper number: 1 {
-		//				location <- any_location_in(myself.shape);
-		//				playerLand_ID <- myself.playerLand_ID;
-		//				myself.playerPumper << self;
-		//			}
-		//
-		//		}
+
 
 	}
 
@@ -93,15 +81,7 @@ global {
 
 		//		write wu_cost;
 	}
-	// calculate total water unit of the data
-//	float calWater_unit {
-//		float totalWu <- 0.0;
-//		ask LandCell {
-//			totalWu <- totalWu + wu_cost[landuse] * pixelSize / 1E6; // million m3 ;
-//		}
-//
-//		return totalWu;
-//	}
+
 	// subsidence at radius 3 cell around Pumper
 	action updateSubsidenceAquifer {
 	/*
@@ -172,31 +152,6 @@ global {
 	} // end action 
 }
 
-//grid LandCell file: cell_file neighbors: 8 schedules: [] {
-//	int landuse <- int(grid_value);
-//	//	float elevation;
-//	//	float groundWaterUsed;  // total ground water used of land
-//	float waterDemand;
-//	float plantHealth; // healthy, die
-//	//	float waterExtracted;//: Water volume - waterExtracted
-//	//	float loseDepth; //: groundwater extracted is converted to water depth lose (WaterExtracted/pixelSize)	
-//
-//}
-
-//grid SubsidenceCell file: dem_file neighbors: 8 schedules: [] {
-//	float elevation <- float(grid_value);
-//}
-
-//grid AquiferQHCell file: volumeqh_file neighbors: 8 schedules: [] {
-//	float volume <- float(grid_value); //volume M.m3
-//	float groundWaterDepth <- volume * 1000000 / pixelSize ^ 2 update: volume * 1000000 / pixelSize ^ 2; // (Water volume (m3)/pixel_size ^2)
-//}
-
-//grid AquiferQP3Cell file: volumeqp3_file neighbors: 8 schedules: [] {
-//	float volume <- float(grid_value);
-//	float groundWaterDepth <- volume * 1000000 / pixelSize ^ 2 update: volume * 1000000 / pixelSize ^ 2; // (Water volume (m3)/pixel_size ^2)
-//
-//}
 species Pumper {
 	int playerLand_ID;
 	string _id;
@@ -207,17 +162,8 @@ species Pumper {
 	aspect default {
 		draw ipumper border: #red size: 1000;
 
-		//		draw circle(1000) color: #pink;
 	}
 
-	//	reflex update_aqifer { //aquifer qh have no more water 
-	//		if (groundwater1_qh[geometry(self).location] > 0) {
-	//			aquifer <- 'qh';
-	//		} else {
-	//			aquifer <- 'qp3';
-	//		}
-	//
-	//	}
 
 }
 
@@ -252,7 +198,6 @@ species GPlayLand {
 
 	aspect land2d {
 		draw sland at: location + {1000, 0, 0} size: 12000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
-		//		draw "Dead Trees:"+length(tree where !dead(each)) at: location+{1000,0,0} size:10;
 	}
 
 }
@@ -271,27 +216,8 @@ experiment main type: gui {
 	list<rgb> flood_color <- palette([#white, #blue]);
 	list<rgb> depth_color <- palette([#grey, #black]);
 	output {
-	//			display "Digital Elevation Model" type: 3d {
-	//				mesh DEM color: depth_color scale: 10000 no_data: -9999.0 smooth: true triangulation: true;
-	//				graphics information {
-	//					draw "DEM (" + _year + ") min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-	//				}
-	//	
-	//			}s
-	//
-	//		display "Water_qh" type: 3d {
-	//			mesh AquiferQHCell smooth: false;
-	//			//mesh DEM color:depth_color scale:1000 no_data: -9999.0 smooth:true triangulation:false;
-	//			//			graphics information {
-	//			//							draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM) + " - max:" + max(DEM) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-	//			//						}			
-	//			species aez;
-	//			species river;
-	//			species GPlayLand position: {0, 0, 0.01};
-	//		}
-	//
 		display "Groundwater extracted" type: 3d {
-			camera 'default' location: {183000.0, 410250.0, 0.0} target: {183000.0, 136750.0, 0.0};
+//			camera 'default' location: {183000.0, 410250.0, 0.0} target: {183000.0, 136750.0, 0.0};
 			mesh SubsidenceCell_elevation scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
 			species GPlayLand position: {0, 0, 0.01};
 			species Pumper;
