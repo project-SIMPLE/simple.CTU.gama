@@ -6,7 +6,7 @@ global {
 	image_file igate <- image_file("../includes/gate.png");
 	image_file ilake <- image_file("../includes/lake.png");
 	image_file iwarning <- image_file("../includes/warn.png");
-	geometry sland <- rotated_by((obj_file("../includes/SM_base2.obj") as geometry), -90::{1, 0, 0});
+//	geometry sland <- rotated_by((obj_file("../includes/SM_base2.obj") as geometry), -90::{1, 0, 0});
 	shape_file aezone_MKD_region_simple_region0_shape_file <- shape_file("../includes/AEZ/aezone_MKD_region_simple_region.shp");
 	shape_file MKD_WGS84_shape_file <- shape_file("../includes/AdminBound/MKD_WGS84.shp");
 	string scenarioB <- "B1/B1_";
@@ -311,7 +311,7 @@ species GPlayLand {
 	bool active <- false;
 
 	aspect land2d {
-		draw sland at: location+{1000,0,0} size: 12000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
+//		draw sland at: location+{1000,0,0} size: 12000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
 //		draw "Dead Trees:"+length(tree where !dead(each)) at: location+{1000,0,0} size:10;
 	}
 
@@ -376,23 +376,23 @@ experiment main type: gui {
 	//			species GPlayLand position: {0, 0, 0.01};
 	//		}
 	//
-		display "Subsidence - Groundwater extracted" type: 3d {
-			mesh SubsidenceCell scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
-			species GPlayLand position: {0, 0, 0.01};
-			species Pumper;
-			species Lake;
-			species SluiceGate;
-			graphics information {
-				draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM_subsidence) + " - max:" + max(DEM_subsidence) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-			}
+//		display "Subsidence - Groundwater extracted" type: 3d {
+//			mesh SubsidenceCell scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
+//			species GPlayLand position: {0, 0, 0.01};
+//			species Pumper;
+//			species Lake;
+//			species SluiceGate;
+//			graphics information {
+//				draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM_subsidence) + " - max:" + max(DEM_subsidence) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
+//			}
+//
+//		}
 
-		}
-
-		display "Groundwater extractors" type: 3d {
-			species Pumper;
-			species Lake;
-			species SluiceGate;
-		}
+//		display "Groundwater extractors" type: 3d {
+//			species Pumper;
+//			species Lake;
+//			species SluiceGate;
+//		}
 
 	}
 
