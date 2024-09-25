@@ -12,7 +12,7 @@ global {
 	action readVR {
 		ask GPlayLand where (each.subside) {
 			unity_player u <- first(unity_player where (each.myland = self));
-//			write "" + u;
+			//			write "" + u;
 			ask unity_linker {
 				do send_message players: u as list mes: ["subside"::true];
 			}
@@ -24,27 +24,29 @@ global {
 }
 
 species unity_linker parent: abstract_unity_linker {
+//name of the species used to represent a Unity player
 	string player_species <- string(unity_player);
-	float min_player_position_update_duration <- 0.01;
-	list<point> init_locations <- define_init_locations();
+	float min_player_position_update_duration <- 0.1;
+
+	//in this model, information about other player will be automatically sent to the Player at every step, so we set do_info_world to true
+	bool do_send_world <- true;
 
 	//number of players in the game
-	int number_players <- 1 max: 4;
+	int number_players <- 4 max: 4;
 
 	//max number of players that can play the game
 	int max_num_players <- number_players;
 
-	//in this model, information about other player will be automatically sent to the Player at every step, so we set do_info_world to true
-	bool do_send_world <- false;
-
 	//min number of players to start the simulation
 	int min_num_players <- number_players;
+
+	//initial location of the player
+	list<point> init_locations <- define_init_locations();
 	list<point> define_init_locations {
 		return GPlayLand collect each.location; //[{50.0,50.0,0.0}];
 	}
 
-	unity_property up_geom;
-
+	//	unity_property up_geom;
 	init {
 		do define_properties;
 		//		do add_background_geometries(GPlayLand,up_geom);
@@ -65,8 +67,9 @@ species unity_linker parent: abstract_unity_linker {
 	}
 
 	action construction_message (string idP, string id, int iid, int x, int y, int z) {
-//		write "" + id;
-	//			write "" + idP+ " |" + id + " |" + iid + " " + x + " " + y + " " + z;
+			
+//			write "" + idP;
+//				write "" + idP+ " |" + id + " |" + iid + " |" + x + " |" + y + " |" + z;
 	//		x <- (100 - x) * 1.6 + 10;
 	//		y <- y * 1.8 + 100;
 		unity_player Pl <- first(unity_player where (each.name = idP));
@@ -108,7 +111,8 @@ species unity_linker parent: abstract_unity_linker {
 
 		}
 
-		if (id contains "SaltyWater") {
+		if (id contains "SaltyWater") {		
+		
 			enemy t <- first(enemy where (each._id = iid));
 			if (t != nil) {
 				ask t {
@@ -184,7 +188,7 @@ species unity_linker parent: abstract_unity_linker {
 	}
 
 	action DeletePlayer (string idP, string id, int iid) {
-//			write "" + id  ; 
+	//			write "" + id  ; 
 		if (id contains "Coconut" or id contains "Banana" or id contains "Orange") {
 			tree t <- first(tree where (each._id = iid));
 			if (t != nil) {
@@ -199,7 +203,7 @@ species unity_linker parent: abstract_unity_linker {
 		if (id contains "SpawnEnemy") {
 			ask warning {
 				do die;
-			} 
+			}
 
 		}
 
@@ -215,10 +219,11 @@ species unity_linker parent: abstract_unity_linker {
 		}
 
 	}
+
 	action define_properties {
 		unity_aspect geom_aspect <- geometry_aspect(10.0, #gray, precision);
-		up_geom <- geometry_properties("block", "selectable", geom_aspect, #ray_interactable, false);
-		unity_properties << up_geom;
+		//		up_geom <- geometry_properties("block", "selectable", geom_aspect, #ray_interactable, false);
+		//		unity_properties << up_geom;
 	}
 
 }
@@ -238,6 +243,9 @@ species unity_player parent: abstract_unity_player {
 
 	//rotation to apply from the heading of Unity to GAMA
 	float player_rotation <- 90.0;
+
+	//display the player
+	bool to_display <- true;
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
@@ -274,12 +282,11 @@ species unity_player parent: abstract_unity_player {
 		}
 
 	}
-	//display the player
-	bool to_display <- true;
+
 	float z_offset <- 2.0;
 
 	reflex ss {
-		heading<--heading;
+		heading <- -heading;
 		location <- (location * 100) + myland.location;
 	}
 
@@ -297,19 +304,34 @@ species unity_player parent: abstract_unity_player {
 
 }
 
-experiment vr_xp autorun: false type: unity {
+experiment vr_xp parent: main autorun: false type: unity {
+//minimal time between two simulation step
 	float minimum_cycle_duration <- 0.01;
-	string unity_linker_species <- string(unity_linker);
-	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
-	float t_ref;
 
+	//name of the species used for the unity_linker
+	string unity_linker_species <- string(unity_linker);
+
+	//allow to hide the "map" display and to only display the displayVR display 
+	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
+
+	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		ask unity_linker {
 			do create_player(id);
+
+			//build invisible walls surrounding the free_area geometry
+			//			do build_invisible_walls(player: last(unity_player), //player to send the information to
+			//			id: "wall_for_world", //id of the walls
+			//			height: 40.0, //height of the walls
+			//			wall_width: 0.5, //width ot the walls
+			//			geoms: [world.shape] //geometries used to defined the walls - the walls will be generated from the countour of these geometries
+			//);
 		}
 
+		write unity_player as list;
 	}
 
+	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
 		if (not empty(unity_player)) {
 			ask first(unity_player where (each.name = id_input)) {
@@ -320,6 +342,8 @@ experiment vr_xp autorun: false type: unity {
 
 	}
 
+	//variable used to avoid to move too fast the player agent
+	float t_ref;
 	output {
 		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: true tabs: false editors: false;
 		display "Subsidence - Groundwater extracted1" type: 3d background: #black axes: false {
@@ -337,10 +361,10 @@ experiment vr_xp autorun: false type: unity {
 			species tree;
 			species SluiceGate;
 			species Lake;
-			species warning  position: {0, 0, 0.1};
+			species warning position: {0, 0, 0.1};
 			species Pumper;
 			species enemy;
-			species unity_player transparency:0.5;
+			species unity_player transparency: 0.5;
 			//			 event #mouse_down{
 			//				 float t <- gama.machine_time;
 			//				 if (t - t_ref) > 500 {
@@ -352,6 +376,68 @@ experiment vr_xp autorun: false type: unity {
 			//			 }
 		}
 
+		display "P2" background: #black type: 3d axes: false {
+			camera 'default' location: {317651.54, 108884.4166, 17807.3996} target: {317651.54, 108884.1058, 0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
+
+		display "P3" background: #black type: 3d axes: false {
+			camera 'default' location: {264110.5481, 148732.6871, 20206.4384} target: {264110.5481, 148732.3344, 0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
+
+		display "P4" background: #black type: 3d axes: false {
+			camera 'default' location: {177075.0127, 170800.3465, 20978.6759} target: {177075.0127, 170799.9803, 0.0};
+			species GPlayLand aspect: land2d;
+			species unity_player transparency: 0.5;
+			species tree;
+			species SluiceGate;
+			species Lake;
+			species warning;
+			species Pumper;
+			species enemy;
+			//			 event #mouse_down{
+			//				 float t <- gama.machine_time;
+			//				 if (t - t_ref) > 500 {
+			//					 ask unity_linker {
+			//						 move_player_event <- true;
+			//					 }
+			//					 t_ref <- t;
+			//				 }
+			//			 }
+		}
 
 	}
 
