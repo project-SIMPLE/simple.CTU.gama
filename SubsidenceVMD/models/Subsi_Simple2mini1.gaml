@@ -45,9 +45,17 @@ global {
 	//salt water quantity level
 	float saltwaterQuantity <- 1.0;
 
+	map<rgb, team> player_teams <- [];
+	list<rgb> village_colors <- [#green, #yellow, #red, #blue];
 	init {
+		loop c over: village_colors {
+			create team with: [color::c] returns: t;
+			player_teams[c] <- first(t);
+		}
 		create aez from: aezone_MKD_region_simple_region0_shape_file;
 		create GPlayLand from: players0_shape_file with: [playerLand_ID::int(read('region'))] {
+			my_team<-team[int(self)];
+					my_team.players << self;
 		//create the list of construction read from VRGame
 		/*create constrction from VRPumper */
 			create Pumper number: 10 {

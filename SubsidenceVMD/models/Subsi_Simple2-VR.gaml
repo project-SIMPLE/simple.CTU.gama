@@ -6,6 +6,7 @@ global {
 //color of the different players
 	list<rgb> color_players <- [#yellow, #green, #violet, #red];
 
+ 
 	init {
 	}
 
@@ -344,10 +345,49 @@ experiment vr_xp parent: main autorun: false type: unity {
 
 	//variable used to avoid to move too fast the player agent
 	float t_ref;
+	
+	
+	map<rgb, rgb> text_colors <- [#green::#white, #yellow::#black, #red::#white, #blue::#white];
+	font text <- font("Arial", 24, #bold);
+	font title <- font("Arial", 18, #bold);
+	int x_origin <- 50;
+	int x_interval <- 60;
+	int y_interval <- 40;
+	int box_size <- 30;
+	
 	output {
-		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: true tabs: false editors: false;
+		layout horizontal([0::4612, horizontal([vertical([1::5000, 2::5000])::5000, vertical([3::5000, 4::5000])::5000])::6388]) consoles: false tabs: false editors: false;
+//		layout #split consoles: false tabs: false editors: false;
 		display "Groundwater extracted" type: 3d background: #black axes: false {
-			camera 'default' location: {243237.2195, 132619.9172, 310954.9886} target: {243237.2195, 132614.49, 0.0};
+//			camera 'default' location: {243237.2195, 132619.9172, 310954.9886} target: {243237.2195, 132614.49, 0.0};
+		
+			overlay position: {0 #px, 0 #px} size: {0 #px, 0 #px} background: #white border: #white rounded: false {
+				float y <- 2 * y_interval #px;
+				draw rectangle((10 * x_interval) #px, 10 * box_size #px) at: {x_origin + (4 * x_interval) #px, y} color: rgb(0, 0, 0, 0.5);
+				draw "Team score" at: {x_origin + (1 * x_interval) #px, y_interval #px} anchor: #top_center color: #white font: title;
+				draw "Player" at: {x_origin + (4 * x_interval) #px, y_interval #px} anchor: #top_center color: #white font: title;
+				draw "Score" at: {x_origin + (6 * x_interval) #px, y_interval #px} anchor: #top_center color: #white font: title;
+				draw "Time left" at: {x_origin + (8 * x_interval) #px, y_interval #px} anchor: #top_center color: #white font: title;
+				map<rgb, team> temp <- [];
+				loop t over: (player_teams.values sort_by each.score) {
+					temp[t.color] <- t;
+				}
+
+				loop p over: reverse(temp.pairs) {
+					draw rectangle((10 * x_interval) #px, box_size #px) at: {x_origin + (4 * x_interval) #px, y} color: (p.key);
+					//draw rectangle(x_interval #px, box_size #px) at: {x_interval / 2, y} color: p.key;
+					draw string(p.value.score) at: {x_origin + (1 * x_interval) #px, y} anchor: #center color: text_colors[p.key] font: text;
+					draw "#" + p.value.generation at: {x_origin + (4 * x_interval) #px, y} anchor: #center color: text_colors[p.key] font: text;
+					GPlayLand last <- last(p.value.players);
+					if (last != nil) {
+						draw string(last.current_score) at: {x_origin + (6 * x_interval) #px, y} anchor: #center color: text_colors[p.key] font: text;
+						draw string(last.remaining_time) + " sec" at: {x_origin + (8 * x_interval) #px, y} anchor: #center color: text_colors[p.key] font: text;
+					}
+					y <- y + y_interval #px;
+				}
+
+
+			}
 			mesh SubsidenceCell_elevation scale: -1 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
 			species GPlayLand aspect:land2d position: {0, 0, 0.01};
 			species Pumper;
@@ -364,16 +404,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 			species warning position: {0, 0, 0.1};
 			species Pumper;
 			species enemy;
-			species unity_player transparency: 0.5;
-			//			 event #mouse_down{
-			//				 float t <- gama.machine_time;
-			//				 if (t - t_ref) > 500 {
-			//					 ask unity_linker {
-			//						 move_player_event <- true;
-			//					 }
-			//					 t_ref <- t;
-			//				 }
-			//			 }
+			species unity_player transparency: 0.5; 
 		}
 
 		display "P2" background: #black type: 3d axes: false {
@@ -385,16 +416,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 			species Lake;
 			species warning;
 			species Pumper;
-			species enemy;
-			//			 event #mouse_down{
-			//				 float t <- gama.machine_time;
-			//				 if (t - t_ref) > 500 {
-			//					 ask unity_linker {
-			//						 move_player_event <- true;
-			//					 }
-			//					 t_ref <- t;
-			//				 }
-			//			 }
+			species enemy; 
 		}
 
 		display "P3" background: #black type: 3d axes: false {
@@ -407,15 +429,6 @@ experiment vr_xp parent: main autorun: false type: unity {
 			species warning;
 			species Pumper;
 			species enemy;
-			//			 event #mouse_down{
-			//				 float t <- gama.machine_time;
-			//				 if (t - t_ref) > 500 {
-			//					 ask unity_linker {
-			//						 move_player_event <- true;
-			//					 }
-			//					 t_ref <- t;
-			//				 }
-			//			 }
 		}
 
 		display "P4" background: #black type: 3d axes: false {
@@ -428,15 +441,6 @@ experiment vr_xp parent: main autorun: false type: unity {
 			species warning;
 			species Pumper;
 			species enemy;
-			//			 event #mouse_down{
-			//				 float t <- gama.machine_time;
-			//				 if (t - t_ref) > 500 {
-			//					 ask unity_linker {
-			//						 move_player_event <- true;
-			//					 }
-			//					 t_ref <- t;
-			//				 }
-			//			 }
 		}
 
 	}

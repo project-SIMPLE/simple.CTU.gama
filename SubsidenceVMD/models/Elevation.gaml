@@ -72,11 +72,12 @@ species enemy skills: [moving] {
 	string _id;
 	int playerLand_ID;
 	point target;
-	bool spotted<-false;
+	bool spotted <- false;
+
 	reflex move {
 	//we use the return_path facet to return the path followed
 		do goto target: target on: road_network recompute_path: false return_path: false speed: 50.0;
-		if (location distance_to target <10) {
+		if (location distance_to target < 10) {
 			do die;
 		}
 
@@ -95,21 +96,23 @@ species freshwater skills: [moving] {
 
 	reflex chose when: target = nil or dead(target) {
 		target <- ((enemy at_distance 7000) where (!each.spotted)) closest_to self;
-		if(target!=nil){
-			target.spotted<-true;
-		}else{
+		if (target != nil) {
+			target.spotted <- true;
+		} else {
 			do die;
 		}
+
 	}
 
 	reflex move {
-		 
-			do goto target: target.location on: road_network recompute_path: true speed: 70.0;
-			if (location distance_to target<10) {
-				ask target{do die;}
+		do goto target: target.location on: road_network recompute_path: true speed: 70.0;
+		if (location distance_to target < 10) {
+			ask target {
 				do die;
 			}
- 
+
+			do die;
+		}
 
 	}
 
@@ -125,7 +128,8 @@ species Pumper parent: DraggedAgent {
 	string _id;
 	string aquifer; // 'qh', 'qp3'
 	geometry shape <- square(1000);
-	int rndstart<-100+int(self)*50;
+	int rndstart <- 100 + int(self) * 50;
+
 	aspect default {
 		draw cube(1000) texture: ipumper;
 		//		draw shape color:#red;
@@ -135,7 +139,7 @@ species Pumper parent: DraggedAgent {
 	reflex product_fresh_water when: (cycle > 0) and (cycle mod rndstart = 0) {
 		create freshwater {
 			location <- myself.location;
-//			target <- (enemy at_distance 100) closest_to self;
+			//			target <- (enemy at_distance 100) closest_to self;
 		}
 
 	}
@@ -180,18 +184,24 @@ species GPlayLand {
 	int numberLake <- 1;
 	int numberSluice <- 1;
 	float volumePump <- 0.0;
-
+	//has the player finished ? 
+	bool finished <- false;
+	team my_team;
+	int remaining_time <- 18000;
+	int current_score;
+	geometry shape<-square(5000);
 	aspect default {
 	//		draw shape.contour + 1000 color: #red;
-	draw iscene;
-//		draw shape texture:iscene;
+		draw iscene;
+		//		draw shape texture:iscene;
 	}
 
 	aspect d2 {
 	//		draw shape.contour + 1000 color: #red;
-//	draw shape texture:iscene;
-		draw iscene size:10000;
+	//	draw shape texture:iscene;
+		draw iscene size: 10000;
 	}
+
 	aspect full {
 	//		draw shape.contour + 1000 color: #red;
 		draw iscenefull;
@@ -205,8 +215,17 @@ species GPlayLand {
 	bool active <- false;
 
 	aspect land2d {
-		draw shape;
-		draw "Dead Trees:" + length(tree where !dead(each)) at: location + {1000, 0, 0} size: 10;
+		draw shape.contour + 1000 color: #red;
+
+		//		draw shape;
+		//		draw "Dead Trees:" + length(tree where !dead(each)) at: location + {1000, 0, 0} size: 10;
 	}
 
+}
+
+species team {
+	list<GPlayLand> players <- [];
+	int score <- 0;
+	rgb color;
+	int generation <- 1;
 }
