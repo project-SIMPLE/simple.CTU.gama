@@ -187,6 +187,11 @@ species GPlayLand {
 //		draw shape texture:iscene;
 	}
 
+	aspect d2 {
+	//		draw shape.contour + 1000 color: #red;
+//	draw shape texture:iscene;
+		draw iscene size:10000;
+	}
 	aspect full {
 	//		draw shape.contour + 1000 color: #red;
 		draw iscenefull;
