@@ -1,6 +1,8 @@
 model LoadSubsi
 
-global {
+global {	
+	image_file iscene <- image_file("../includes/scene.jpg");
+
 	image_file itree <- image_file("../includes/tree.png");
 	image_file ipumper <- image_file("../includes/pumper.png");
 	image_file igate <- image_file("../includes/gate.png");
@@ -300,9 +302,10 @@ species GPlayLand {
 	float volumePump <- 0.0;
 
 	aspect default {
-		draw shape.contour + 1000 color: #red;
+	//		draw shape.contour + 1000 color: #red;
+//	draw shape texture:iscene;
+		draw iscene size:10000;
 	}
-
 	reflex {
 		volumePump <- numberPumper * pumVolumeHour;
 	}
@@ -311,6 +314,7 @@ species GPlayLand {
 	bool active <- false;
 
 	aspect land2d {
+		draw shape.contour + 1000 color: #red;
 //		draw sland at: location+{1000,0,0} size: 12000 color: active ? #green : #grey rotate: 90 * 2::{0, 0, 1};
 //		draw "Dead Trees:"+length(tree where !dead(each)) at: location+{1000,0,0} size:10;
 	}

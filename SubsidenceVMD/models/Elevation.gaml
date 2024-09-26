@@ -183,7 +183,8 @@ species GPlayLand {
 
 	aspect default {
 	//		draw shape.contour + 1000 color: #red;
-		draw iscene;
+	draw iscene;
+//		draw shape texture:iscene;
 	}
 
 	aspect full {

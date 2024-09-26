@@ -349,7 +349,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 		display "Subsidence - Groundwater extracted1" type: 3d background: #black axes: false {
 			camera 'default' location: {243237.2195, 132619.9172, 310954.9886} target: {243237.2195, 132614.49, 0.0};
 			mesh SubsidenceCell scale: 1000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: false;
-			species GPlayLand position: {0, 0, 0.01};
+			species GPlayLand aspect:land2d position: {0, 0, 0.01};
 			species Pumper;
 			species Lake;
 			species SluiceGate;
@@ -357,7 +357,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 
 		display "P1" background: #black type: 3d axes: false {
 			camera 'default' location: {327596.9917, 58818.3336, 12993.7722} target: {327596.9917, 58818.1068, 0.0};
-			species GPlayLand aspect: land2d;
+			species GPlayLand;
 			species tree;
 			species SluiceGate;
 			species Lake;
@@ -378,7 +378,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 
 		display "P2" background: #black type: 3d axes: false {
 			camera 'default' location: {317651.54, 108884.4166, 17807.3996} target: {317651.54, 108884.1058, 0.0};
-			species GPlayLand aspect: land2d;
+			species GPlayLand;
 			species unity_player;
 			species tree;
 			species SluiceGate;
@@ -399,7 +399,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 
 		display "P3" background: #black type: 3d axes: false {
 			camera 'default' location: {264110.5481, 148732.6871, 20206.4384} target: {264110.5481, 148732.3344, 0.0};
-			species GPlayLand aspect: land2d;
+			species GPlayLand;
 			species unity_player;
 			species tree;
 			species SluiceGate;
@@ -420,7 +420,7 @@ experiment vr_xp parent: main autorun: false type: unity {
 
 		display "P4" background: #black type: 3d axes: false {
 			camera 'default' location: {177075.0127, 170800.3465, 20978.6759} target: {177075.0127, 170799.9803, 0.0};
-			species GPlayLand aspect: land2d;
+			species GPlayLand;
 			species unity_player transparency: 0.5;
 			species tree;
 			species SluiceGate;
