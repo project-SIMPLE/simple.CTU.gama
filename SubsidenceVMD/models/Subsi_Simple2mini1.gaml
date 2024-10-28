@@ -6,7 +6,7 @@ global {
 	image_file igate <- image_file("../includes/gate.png");
 	image_file ilake <- image_file("../includes/lake.png");
 	image_file iwarning <- image_file("../includes/warn.png");
-	geometry sland <- rotated_by((obj_file("../includes/SM_base2.obj") as geometry), -90::{1, 0, 0});
+//	geometry sland <- rotated_by((obj_file("../includes/SM_base2.obj") as geometry), -90::{1, 0, 0});
 	shape_file aezone_MKD_region_simple_region0_shape_file <- shape_file("../includes/AEZ/aezone_MKD_region_simple_region.shp");
 	shape_file MKD_WGS84_shape_file <- shape_file("../includes/AdminBound/MKD_WGS84.shp");
 	string scenarioB <- "B1/B1_";

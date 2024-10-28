@@ -171,26 +171,26 @@ experiment main1 type: gui {
 				}
 
 			}
-//			event #mouse_down {
-//				ask simulation {
-//					do mouse_down;
-//				}
-//
-//			}
-//
-//			event #mouse_up {
-//				ask simulation {
-//					do mouse_up;
-//				}
-//
-//			}
-//
-//			event #mouse_move {
-//				ask simulation {
-//					do mouse_move;
-//				}
-//
-//			}
+			event #mouse_down {
+				ask simulation {
+					do mouse_down;
+				}
+
+			}
+
+			event #mouse_up {
+				ask simulation {
+					do mouse_up;
+				}
+
+			}
+
+			event #mouse_move {
+				ask simulation {
+					do mouse_move;
+				}
+
+			}
 
 			//			mesh SubsidenceCell scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
 			species GPlayLand position: {0, 0, -0.01};
