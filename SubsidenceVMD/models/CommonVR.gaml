@@ -10,7 +10,7 @@ model CommonVR
 
 
 import "Subsi_Simple2mini1.gaml"
-
+  
 global {
 //color of the different players
 	list<rgb> color_players <- [#yellow, #green, #violet, #red];
@@ -29,7 +29,7 @@ global {
 
 		}
 
-	}
+	} 
 
 }
 
@@ -56,11 +56,6 @@ species unity_linker parent: abstract_unity_linker {
 		return GPlayLand collect each.location; //[{50.0,50.0,0.0}];
 	}
 
-	//	unity_property up_geom;
-	init {
-		do define_properties;
-		//		do add_background_geometries(GPlayLand,up_geom);
-	}
 	
 	reflex when: cycle = 0 {
 		do send_message(unity_player as list, ["readyToStart"::""]);
@@ -80,169 +75,116 @@ species unity_linker parent: abstract_unity_linker {
 	//		write "Player " + id + " send the message: " + mes;
 	}
 
-	action construction_message (string idP, string id, int iid, int x, int y, int z) {
-			
-//			write "" + idP;
-//				write "" + idP+ " |" + id + " |" + iid + " |" + x + " |" + y + " |" + z;
-	//		x <- (100 - x) * 1.6 + 10;
-	//		y <- y * 1.8 + 100;
+	point toGAMACoordinate(int x, int y) {
+		float xa <- 3550.0;
+		float xb <- 188639.0;
+		float ya <- -2387.0;
+		float yb <- 151614.0;
+		return {x/precision * xa + xb, y/precision * ya + yb};
+	}
+
+	action create_tree(string idP, string idT, int x, int y) {
+		point pt <- toGAMACoordinate(x,y);
 		unity_player Pl <- first(unity_player where (each.name = idP));
-		float x2 <- x * 100 + Pl.myland.location.x;
-		float y2 <- y * 100 + Pl.myland.location.y;
-		string idds <- string(iid);
-		if (id contains "Coconut" or id contains "Banana" or id contains "Orange") {
-			tree t <- first(tree where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
-			} else {
-				create tree {
-					_id <- idds;
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					location <- {x2, y2};
-				}
-
-			}
-
+		create tree {
+			_id <- idT;
+			playerLand_ID <- Pl.myland.playerLand_ID;
+			Pl.myland.trees << self;
+			location <- pt;
 		}
-
-		if (id contains "SpawnEnemy") {
-			warning t <- first(warning where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
-			} else {
-				create warning {
-					_id <- idds;
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					location <- {x2, y2};
-				}
-
-			}
-
+	}
+	
+	action delete_tree(string idP, string idT) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		tree t <- Pl.myland.trees first_with (each._id = idT);
+		Pl.myland.trees >> t;
+		ask t {
+			do die;
 		}
-
-		if (id contains "SaltyWater") {		
-		
-			enemy t <- first(enemy where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
+	}
+	action move_create_pumper(string idP, string idwp, int x, int y) {
+		point pt <- toGAMACoordinate(x,y);
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
+		if (wp != nil) {
+			wp.location <- pt;
+		} else {
+			create Pumper {
+				_id <- idwp;
+				playerLand_ID <- Pl.myland.playerLand_ID;
+				Pl.myland.pumpers << self;
+				location <- pt;
+			}
+		} 
+	}
+	
+	action delete_water_pump(string idP, string idwp) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
+		Pl.myland.pumpers >> wp;
+		ask wp {
+			do die;
+		}
+	}
+	
+	
+	action update_salty_water(string idP, list<string> sws, list<int> xs, list<int> ys) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		list<enemy> to_remove <- enemy as list;
+		loop i from: 0 to: length(sws) -1 {
+			string idsw <- sws[i];
+			int x <- xs[i];
+			int y <- ys[i];
+			point pt <- toGAMACoordinate(x,y);
+			enemy sw <- Pl.myland.enemies first_with (each._id = idsw);
+			if (sw != nil) {
+				sw.location <- pt;
+				to_remove >> sw;
 			} else {
 				create enemy {
-					_id <- idds;
+					_id <- idsw;
 					playerLand_ID <- Pl.myland.playerLand_ID;
-					location <- {x2, y2};
-				}
-
+					Pl.myland.enemies << self;
+					location <- pt;
+				} 
 			}
-
 		}
-
-		if (id contains "WaterPump") {
-			Pumper t <- first(Pumper where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
-			} else {
-				create Pumper {
-					_id <- idds;
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					Pl.myland.playerPumper << self;
-					location <- {x2, y2};
-				}
-
-			}
-
-		}
-
-		if (id contains "Gate") {
-			SluiceGate t <- first(SluiceGate where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
-			} else {
-				create SluiceGate {
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					_id <- idds;
-					location <- {x2, y2};
-				}
-
-			}
-
-		}
-
-		if (id contains "Lake") {
-			Lake t <- first(Lake where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					location <- {x2, y2};
-				}
-
-			} else {
-				create Lake {
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					_id <- idds;
-					location <- {x2, y2};
-				}
-
-			}
-
-		}
-
-	}
-
-	action DeletePlayer (string idP, string id, int iid) {
-	//			write "" + id  ; 
-		string idds <- string(iid);
-		
-		if (id contains "Coconut" or id contains "Banana" or id contains "Orange") {
-			tree t <- first(tree where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					do die;
-				}
-
-			}
-
-		}
-
-		if (id contains "SpawnEnemy") {
-			ask warning {
+		if not empty(to_remove) {
+			ask to_remove {
 				do die;
 			}
-
 		}
-
-		if (id contains "SaltyWater(Clone)") {
-			enemy t <- first(enemy where (each._id = idds));
-			if (t != nil) {
-				ask t {
-					do die;
-				}
-
+	} 
+	
+	
+	action update_fresh_water(string idP, list<string> fws, list<int> xs, list<int> ys) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		list<freshwater> to_remove <- freshwater as list;
+		loop i from: 0 to: length(fws) -1 {
+			string idfw <- fws[i];
+			int x <- xs[i];
+			int y <- ys[i];
+			point pt <- toGAMACoordinate(x,y);
+			freshwater sw <- Pl.myland.fresh_waters first_with (each._id = idfw);
+			if (sw != nil) {
+				sw.location <- pt;
+				to_remove >> sw;
+			} else {
+				create freshwater {
+					_id <- idfw;
+					playerLand_ID <- Pl.myland.playerLand_ID;
+					Pl.myland.fresh_waters << self;
+					location <- pt;
+				} 
 			}
-
 		}
-
-	}
-
-	action define_properties {
-		unity_aspect geom_aspect <- geometry_aspect(10.0, #gray, precision);
-		//		up_geom <- geometry_properties("block", "selectable", geom_aspect, #ray_interactable, false);
-		//		unity_properties << up_geom;
-	}
-
+		if not empty(to_remove) {
+			ask to_remove {
+				do die;
+			}
+		}
+	} 
+	
 }
 
 species unity_player parent: abstract_unity_player {
@@ -269,7 +211,6 @@ species unity_player parent: abstract_unity_player {
 		write myland;
 		myland.cntDem <- 0;
 		myland.subside <- false;
-		myland.active <- true;
 		do Restart(myland.playerLand_ID);
 	}
 
@@ -286,17 +227,11 @@ species unity_player parent: abstract_unity_player {
 			do die;
 		}
 
-		ask Lake where (each.playerLand_ID = id) {
-			do die;
-		}
-
+	
 		ask Pumper where (each.playerLand_ID = id) {
 			do die;
 		}
 
-		ask SluiceGate where (each.playerLand_ID = id) {
-			do die;
-		}
 
 	}
 

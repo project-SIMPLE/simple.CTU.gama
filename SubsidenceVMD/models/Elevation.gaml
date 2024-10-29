@@ -1,7 +1,6 @@
 model LoadSubsi
 
-import "Mouse Event.gaml"
-import "Entities.gaml"
+import "Entities.gaml" 
 
 global {
 	int fsize <- 100;
@@ -35,10 +34,7 @@ global {
 	//	list<point> source_enemy<-[{12904.852740244474,25972.450658208225},{12904.852740244474,25972.450658208225},{8475.46436587174,24609.561913607642}];
 	geometry avai_space;
 
-	init {
-		create river from: river_region0_shape_file;
-	}
-
+	
 	reflex mainReflex2 {
 		do updateSubsidenceAquifer;
 		diffuse var: phero on: SubsidenceCell_elevation proportion: 1;
@@ -52,7 +48,7 @@ global {
 			player_temp.volumePump <- player_temp.numberPumper * pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear; // volum hour * hour*days*months m3	
 			//			write "Pump volume of player " + player_temp + ":" + player_temp.volumePump;
 			tmpDepthLose <- player_temp.volumePump / pixelSize; //m
-			ask player_temp.playerPumper {
+			ask player_temp.pumpers {
 				Pumper tmpPumper <- self;
 				loop s over: mysub {
 					SubsidenceCell_elevation[geometry(s).location] <- SubsidenceCell_elevation[geometry(s).location] + 100; // rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
@@ -68,164 +64,4 @@ global {
 
 }
 
-species enemy skills: [moving] {
-	string _id;
-	int playerLand_ID;
-	point target;
-	bool spotted <- false;
 
-	reflex move {
-	//we use the return_path facet to return the path followed
-		do goto target: target on: road_network recompute_path: false return_path: false speed: 50.0;
-		if (location distance_to target < 10) {
-			do die;
-		}
-
-	}
-
-	aspect default {
-		draw circle(300) color: #red;
-	}
-
-}
-
-species freshwater skills: [moving] {
-	string _id;
-	int playerLand_ID;
-	enemy target;
-
-	reflex chose when: target = nil or dead(target) {
-		target <- ((enemy at_distance 7000) where (!each.spotted)) closest_to self;
-		if (target != nil) {
-			target.spotted <- true;
-		} else {
-			do die;
-		}
-
-	}
-
-	reflex move {
-		do goto target: target.location on: road_network recompute_path: true speed: 70.0;
-		if (location distance_to target < 10) {
-			ask target {
-				do die;
-			}
-
-			do die;
-		}
-
-	}
-
-	aspect default {
-		draw circle(300) color: #blue;
-	}
-
-}
-
-species Pumper parent: DraggedAgent {
-	list mysub;
-	int playerLand_ID;
-	string _id;
-	string aquifer; // 'qh', 'qp3'
-	geometry shape <- square(1000);
-	int rndstart <- 100 + int(self) * 50;
-
-	aspect default {
-		draw cube(1000) texture: ipumper;
-		//		draw shape color:#red;
-		//		draw circle(1000) color: #pink;
-	}
-
-	reflex product_fresh_water when: (cycle > 0) and (cycle mod rndstart = 0) {
-		create freshwater {
-			location <- myself.location;
-			//			target <- (enemy at_distance 100) closest_to self;
-		}
-
-	}
-
-}
-
-species Lake {
-	int playerLand_ID;
-	string _id;
-
-	aspect default {
-		draw ilake border: #red size: 1000;
-
-		//		draw rectangle(1000, 3000) color: #blue border: #black;
-	}
-
-}
-
-species SluiceGate {
-	int playerLand_ID;
-	string _id;
-
-	aspect default {
-	//		draw circle(2000) color: #gray;
-		draw igate border: #red size: 1000;
-	}
-
-}
-
-species GPlayLand {
-	int playerLand_ID;
-	list<Pumper> playerPumper;
-	list<Lake> playerLake;
-	list<SluiceGate> playerSluicegate;
-	//exchange construction. 
-	list<Pumper> VRPumper;
-	list<Lake> VRLake;
-	list<SluiceGate> VRSluice;
-	bool subside <- false;
-	int cntDem <- 0;
-	int numberPumper <- 1;
-	int numberLake <- 1;
-	int numberSluice <- 1;
-	float volumePump <- 0.0;
-	//has the player finished ? 
-	bool finished <- false;
-	team my_team;
-	int remaining_time <- 18000;
-	int current_score;
-	geometry shape<-square(5000);
-	aspect default {
-	//		draw shape.contour + 1000 color: #red;
-		draw iscene;
-		//		draw shape texture:iscene;
-	}
-
-	aspect d2 {
-	//		draw shape.contour + 1000 color: #red;
-	//	draw shape texture:iscene;
-		draw iscene size: 10000;
-	}
-
-	aspect full {
-	//		draw shape.contour + 1000 color: #red;
-		draw iscenefull;
-	}
-
-	reflex ss {
-		volumePump <- numberPumper * pumVolumeHour;
-	}
-
-	int rot <- 0;
-	bool active <- false;
-
-	aspect land2d {
-		draw shape.contour + 1000 color: #red;
-
-		//		draw shape;
-		//		draw "Dead Trees:" + length(tree where !dead(each)) at: location + {1000, 0, 0} size: 10;
-	}
-
-}
-
-species team {
-	list<GPlayLand> players <- [];
-	int score <- 0;
-	rgb color;
-	int generation <- 1;
-}

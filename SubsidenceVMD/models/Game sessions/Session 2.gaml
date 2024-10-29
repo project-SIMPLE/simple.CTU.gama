@@ -2,9 +2,9 @@
 model LoadSubsi_model_VR
 
 import "../CommonVR.gaml"
+ 
 
-
-experiment session2 parent: main autorun: false type: unity  {
+experiment session2  autorun: false type: unity  {
 //minimal time between two simulation step
 	float minimum_cycle_duration <- 0.01;
 
@@ -19,13 +19,7 @@ experiment session2 parent: main autorun: false type: unity  {
 		ask unity_linker {
 			do create_player(id);
 
-			//build invisible walls surrounding the free_area geometry
-			//			do build_invisible_walls(player: last(unity_player), //player to send the information to
-			//			id: "wall_for_world", //id of the walls
-			//			height: 40.0, //height of the walls
-			//			wall_width: 0.5, //width ot the walls
-			//			geoms: [world.shape] //geometries used to defined the walls - the walls will be generated from the countour of these geometries
-			//);
+		 
 		}
 
 		write unity_player as list;
@@ -55,52 +49,41 @@ experiment session2 parent: main autorun: false type: unity  {
 	int box_size <- 30;
 	
 	output {
+		layout #split toolbars:true;
 		display "P1" background: #black type: 3d axes: false {
-			camera 'default' location: {327596.9917, 58818.3336, 12993.7722} target: {327596.9917, 58818.1068, 0.0};
-			species GPlayLand aspect:d2;
-			species tree;
-			species SluiceGate;
-			species Lake;
-			species warning position: {0, 0, 0.1};
-			species Pumper;
-			species enemy;
-			species unity_player transparency: 0.5; 
+			image image_file("../includes/scene.jpg");
+			agents "P1 Tree" value: GPlayLand[0].trees;
+			agents "P1 warning" value: GPlayLand[0].warnings;
+			agents "P1 Pumper" value: GPlayLand[0].pumpers;
+			agents "P1 enemy" value: GPlayLand[0].enemies;
+			agents "P1" value: [unity_player[0]] transparency: 0.5; 
 		}
 
 		display "P2" background: #black type: 3d axes: false {
-			camera 'default' location: {317651.54, 108884.4166, 17807.3996} target: {317651.54, 108884.1058, 0.0};
-			species GPlayLand aspect:d2;
-			species unity_player;
-			species tree;
-			species SluiceGate;
-			species Lake;
-			species warning;
-			species Pumper;
-			species enemy; 
+			image image_file("../includes/scene.jpg");
+			agents "P2 Tree" value: GPlayLand[1].trees;
+			agents "P2 warning" value: GPlayLand[1].warnings;
+			agents "P2 Pumper" value: GPlayLand[1].pumpers;
+			agents "P2 enemy" value: GPlayLand[1].enemies;
+			agents "P2" value: [unity_player[1]] transparency: 0.5; 
 		}
 
 		display "P3" background: #black type: 3d axes: false {
-			camera 'default' location: {264110.5481, 148732.6871, 20206.4384} target: {264110.5481, 148732.3344, 0.0};
-			species GPlayLand aspect:d2;
-			species unity_player;
-			species tree;
-			species SluiceGate;
-			species Lake;
-			species warning;
-			species Pumper;
-			species enemy;
+			image image_file("../includes/scene.jpg");
+			agents "P3 warning" value: GPlayLand[2].warnings;
+			agents "P3 warning" value: GPlayLand[2].warnings;
+			agents "P3 Pumper" value: GPlayLand[2].pumpers;
+			agents "P3 enemy" value: GPlayLand[2].enemies;
+			agents "P3" value: [unity_player[2]] transparency: 0.5; 
 		}
 
 		display "P4" background: #black type: 3d axes: false {
-			camera 'default' location: {177075.0127, 170800.3465, 20978.6759} target: {177075.0127, 170799.9803, 0.0};
-			species GPlayLand aspect:d2;
-			species unity_player transparency: 0.5;
-			species tree;
-			species SluiceGate;
-			species Lake;
-			species warning;
-			species Pumper;
-			species enemy;
+			image image_file("../includes/scene.jpg");
+			agents "P4 Tree" value: GPlayLand[3].trees;
+			agents "P4 warning" value: GPlayLand[3].warnings;
+			agents "P4 Pumper" value: GPlayLand[3].pumpers;
+			agents "P4 enemy" value: GPlayLand[3].enemies;
+			agents "P4" value: [unity_player[3]] transparency: 0.5; 
 		}
 
 	}

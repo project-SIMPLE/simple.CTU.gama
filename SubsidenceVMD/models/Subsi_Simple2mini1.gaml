@@ -1,6 +1,6 @@
 model LoadSubsi
 import "Elevation.gaml"
-global {
+global { 
 	image_file itree <- image_file("../includes/tree.png");
 	image_file ipumper <- image_file("../includes/pumper.png");
 	image_file igate <- image_file("../includes/gate.png");
@@ -52,43 +52,32 @@ global {
 			create team with: [color::c] returns: t;
 			player_teams[c] <- first(t);
 		}
-		create aez from: aezone_MKD_region_simple_region0_shape_file;
-		create GPlayLand from: players0_shape_file with: [playerLand_ID::int(read('region'))] {
+		create GPlayLand number: 4  {
+			playerLand_ID <- int(self);
 			my_team<-team[int(self)];
-					my_team.players << self;
 		//create the list of construction read from VRGame
 		/*create constrction from VRPumper */
-			create Pumper number: 10 {
+			/*create Pumper number: 10 {
 				location <- any_location_in(myself.shape);
 				shape <- square(5000);
 				playerLand_ID <- myself.playerLand_ID;
 				myself.playerPumper << self;
 				mysub <- SubsidenceCell_elevation cells_in self;
-			}
+			}*/
 
 		}
 
-		create river from: river_region0_shape_file;
-		do load_WU_data;
+		//do load_WU_data;
 
 	}
 
 	reflex mainReflex {
-		do updateSubsidenceAquifer;
+		//do updateSubsidenceAquifer;
 
 
 	}
 
-	// load map landuse :: water demand
-	action load_WU_data {
-		matrix cb_matrix <- matrix(csv_file("../includes/water_need_landuse.csv", true));
-		loop i from: 0 to: cb_matrix.rows - 1 {
-			int lu <- int(cb_matrix[0, i]);
-			wu_cost <+ (lu)::float(cb_matrix[2, i]);
-		}
-
-		//		write wu_cost;
-	}
+	
 
 	// subsidence at radius 3 cell around Pumper
 	action updateSubsidenceAquifer {
@@ -99,13 +88,13 @@ global {
 		 */
 		totalGroundVolumeUsed <- 0.0;
 		float tmpDepthLose <- 0.0;
-		float totalLosdepth <- 0.0;
+		float totalLosdepth <- 0.0;  
 		loop player_temp over: GPlayLand {
 		// luong nuoc bơm. Sẽ chỉnh lại lượng nwocs bơn tại vị trí của máy bơm lấy từ Game play
 			player_temp.volumePump <- player_temp.numberPumper * pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear; // volum hour * hour*days*months m3	
 			//			write "Pump volume of player " + player_temp + ":" + player_temp.volumePump;
 			tmpDepthLose <- player_temp.volumePump / pixelSize; //m
-			ask player_temp.playerPumper {
+			ask player_temp.pumpers {
 				Pumper tmpPumper <- self;
 				loop s over: mysub { // update subsi at Pumper 
 				//					ask self neighbors_at 6 {
@@ -143,9 +132,9 @@ global {
 
 				// Update subsidence 
 
-			}
+			} 
 
-			ask player_temp.playerPumper {
+			ask player_temp.pumpers {
 				loop s over: mysub {
 					float tmp <- SubsidenceCell_elevation[geometry(s).location] - rateSubsidence['sluice'] * tmpDepthLose;
 					SubsidenceCell_elevation[geometry(s).location] <- (tmp < -9999) ? SubsidenceCell_elevation[geometry(s).location] : tmp;
@@ -203,32 +192,3 @@ global {
 //
 //}
 
-
-experiment main type: gui virtual: true{
-	list<font>
-	fonts <- [font("Helvetica", 48, #plain), font("Times", 30, #plain), font("Courier", 30, #plain), font("Arial", 24, #bold), font("Times", 30, #bold + #italic), font("Geneva", 30, #bold)];
-	list<rgb> flood_color <- palette([#white, #blue]);
-	list<rgb> depth_color <- palette([#grey, #black]);
-	output {
-		display "Groundwater extracted" type: 3d {
-//			camera 'default' location: {183000.0, 410250.0, 0.0} target: {183000.0, 136750.0, 0.0};
-			mesh SubsidenceCell_elevation scale: 5000 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
-			species GPlayLand position: {0, 0, 0.01};
-			species Pumper;
-			//			species Lake;
-			//			species SluiceGate;
-			//			graphics information {
-			//				draw "Scenario: " + currentScenario + " Flood- min:" + min(DEM_subsidence) + " - max:" + max(DEM_subsidence) at: {0, 0} wireframe: true width: 2 color: #black font: fonts[1];
-			//			}
-
-		}
-
-		//		display "Groundwater extractors" type: 3d {
-		//			species Pumper;
-		//			//			species Lake;
-		//			//			species SluiceGate;
-		//		}
-
-	}
-
-}

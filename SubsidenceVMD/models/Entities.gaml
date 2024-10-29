@@ -7,35 +7,59 @@ global {
 	image_file iscene <- image_file("../includes/scene.jpg");
 	image_file iscenefull <- image_file("../includes/scenefull.jpg");
 	image_file ipumper <- image_file("../includes/pumper.png");
-	image_file igate <- image_file("../includes/gate.png");
-	image_file ilake <- image_file("../includes/lake.png");
 	image_file iwarning <- image_file("../includes/warn.png");
-	shape_file routes0_shape_file <- shape_file("../includes/routes.shp");
 
-
-}
-
-species aez {
-
-	aspect default {
-		draw shape.contour + 500 color: #gray;
-	}
 
 }
  
-
-species route {
-}
  
-
-
-species river {
+ 
+species Pumper  {
+	list mysub;
+	int playerLand_ID;
+	string _id;
+	string aquifer; // 'qh', 'qp3'
+	geometry shape <- square(1000);
 
 	aspect default {
-		draw shape + 100 color: #blue;
+		draw cube(1000) texture: ipumper;
 	}
 
+	
+
 }
+
+
+species GPlayLand {
+	int playerLand_ID;
+	list<Pumper> pumpers;
+	list<tree> trees;
+	list<freshwater> fresh_waters;
+	list<enemy> enemies;
+	list<warning> warnings;
+	
+	bool subside <- false; 
+	int cntDem <- 0;
+	int numberPumper <- 1;
+	int numberLake <- 1;
+	int numberSluice <- 1;
+	float volumePump <- 0.0;
+	//has the player finished ? 
+	bool finished <- false;
+	team my_team;
+	int remaining_time <- 18000;
+	int current_score;
+
+	int rot <- 0;
+
+}
+
+species team {
+	int score <- 0;
+	rgb color;
+	int generation <- 1;
+}
+
  
 species tree {
 	string _id;
@@ -55,15 +79,35 @@ species warning {
 	int playerLand_ID;
 	int count <- 0;
 
-	//	reflex ss {
-	//		count <- count + 1;
-	//		if (count > 100) {
-	//			do die;
-	//		}
-	//
-	//	}
+
 	aspect default {
 		draw iwarning border: #red size: 1000;
+	}
+
+}
+
+
+species enemy  {
+	string _id;
+	int playerLand_ID;
+	point target;
+	bool spotted <- false;
+
+
+	aspect default {
+		draw circle(300) color: #red;
+	}
+
+}
+
+species freshwater {
+	string _id;
+	int playerLand_ID;
+	enemy target;
+
+	
+	aspect default {
+		draw circle(300) color: #blue;
 	}
 
 }

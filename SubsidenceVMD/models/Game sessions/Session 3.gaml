@@ -4,7 +4,7 @@ model LoadSubsi_model_VR
 import "../CommonVR.gaml"
 
 
-experiment session3 parent: main autorun: false type: unity  {
+experiment session3  autorun: false type: unity  {
 //minimal time between two simulation step
 	float minimum_cycle_duration <- 0.01;
 
@@ -51,7 +51,7 @@ experiment session3 parent: main autorun: false type: unity  {
 	font title <- font("Arial", 18, #bold);
 	int x_origin <- 50;
 	int x_interval <- 60;
-	int y_interval <- 40;
+	int y_interval <- 40; 
 	int box_size <- 30;
 	
 	output {
@@ -87,10 +87,7 @@ experiment session3 parent: main autorun: false type: unity  {
 
 			}
 			mesh SubsidenceCell_elevation scale: -1 color: scale([#darkblue::-7.5, #blue::-5, #lightblue::-2.5, #white::0, #green::1]) no_data: -9999.0 smooth: true triangulation: true;
-			species GPlayLand aspect:land2d position: {0, 0, 0.01};
 			species Pumper;
-			species Lake;
-			species SluiceGate;
 		}
 
 		
