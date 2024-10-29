@@ -13,7 +13,7 @@ global {
 	//	field AquiferQP3Cell_groundWaterDepth <- copy(AquiferQP3Cell_volume);
 	field subsidence2018 <- field(fsize, fsize);
 	shape_file players0_shape_file <- shape_file("../includes/4players.shp");
-	float pixelSize <- fsize * fsize; //  500*500/10000 ha  (ha)
+	int pixelSize <- fsize * fsize; //  500*500/10000 ha  (ha)
 	float total_waterused <- 0.0; //total water used 
 	shape_file river_region0_shape_file <- shape_file("../includes/river_region.shp");
 	geometry shape <- envelope(players0_shape_file);

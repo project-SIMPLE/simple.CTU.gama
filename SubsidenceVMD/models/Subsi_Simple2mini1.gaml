@@ -204,7 +204,7 @@ global {
 //}
 
 
-experiment main type: gui {
+experiment main type: gui virtual: true{
 	list<font>
 	fonts <- [font("Helvetica", 48, #plain), font("Times", 30, #plain), font("Courier", 30, #plain), font("Arial", 24, #bold), font("Times", 30, #bold + #italic), font("Geneva", 30, #bold)];
 	list<rgb> flood_color <- palette([#white, #blue]);
