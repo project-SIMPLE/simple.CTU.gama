@@ -41,7 +41,7 @@ species Pumper  {
 	cell my_cell;
 	float fresh_water_generation_rate;
 	aspect default {
-		draw cube(1000) texture: ipumper;
+		draw cube(8000) color: #magenta;//texture: ipumper;
 	}
 
 	reflex extract_water {
@@ -96,11 +96,12 @@ species tree {
 	string _id;
 	int playerLand_ID;
 	int iid;
-	int isz <- 2000;
+	int isz <- 10000;
 
 	aspect default {
 	//		draw itree size: 300;
 		draw itrees[iid] size: isz;
+		//draw circle(isz) color: #magenta;
 	}
 
 }
@@ -121,12 +122,13 @@ species warning {
 species enemy  {
 	string _id;
 	int playerLand_ID;
-	point target;
-	bool spotted <- false;
 
 
 	aspect default {
-		draw circle(300) color: #red;
+		if self overlaps world {
+			draw circle(3000) color: #red;
+		}
+	
 	}
 
 }
@@ -134,11 +136,12 @@ species enemy  {
 species freshwater {
 	string _id;
 	int playerLand_ID;
-	enemy target;
 
 	
 	aspect default {
-		draw circle(300) color: #blue;
+		if self overlaps world {
+			draw circle(3000) color: #lightgreen;
+		}
 	}
 
 }

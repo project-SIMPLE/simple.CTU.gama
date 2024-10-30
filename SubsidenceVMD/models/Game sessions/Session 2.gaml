@@ -1,7 +1,7 @@
 
 model Session2
 
-import "../CommonVR.gaml"
+import "../CommonVR.gaml" 
   
 
 experiment session2  autorun: false type: unity  {
@@ -18,7 +18,7 @@ experiment session2  autorun: false type: unity  {
 	action create_player (string id) {
 		ask unity_linker {
 			do create_player(id);
-
+ 
 		 
 		}
 
@@ -44,7 +44,7 @@ experiment session2  autorun: false type: unity  {
 	point player_1_position <- {0.025,0.025};
 	point player_2_position <- {0.525,0.025};
 	point player_3_position <- {0.025,0.525};
-	point player_4_position <- {0.525,0.525};
+	point player_4_position <- {0.525,0.525}; 
 	
 	
 	
@@ -52,39 +52,44 @@ experiment session2  autorun: false type: unity  {
 	output {
 		display "Main display" background: #black type: 2d axes: false {
 			agents "P1 background" value: [GPlayLand[0]]  size: {0.5,0.5} position: {0,0} refresh: false;
-			image image_file("../includes/scene.jpg") refresh: false size: player_size position: player_1_position;
+			graphics "image1" refresh: false size: player_size position: player_1_position{
+				draw rectangle(world.shape.height * 1177/1421, world.shape.height) texture:image_file("../includes/scene.png") ;
+			}
 			agents "P1 Tree" value: GPlayLand[0].trees  size: player_size position: player_1_position;
 			agents "P1 warning" value: GPlayLand[0].warnings size: player_size position: player_1_position;
 			agents "P1 Pumper" value: GPlayLand[0].pumpers  size: player_size position: player_1_position;
 			agents "P1 enemy" value: GPlayLand[0].enemies  size: player_size position: player_1_position;
-			agents "P1 fresh water" value: GPlayLand[0].enemies  size: player_size position: player_1_position;
+			agents "P1 fresh water" value: GPlayLand[0].fresh_waters  size: player_size position: player_1_position;
 			agents "P1" value: unity_player where (each.myland = GPlayLand[0]) transparency: 0.5  size: player_size position: player_1_position;
 			
 			agents "P2 background" value: [GPlayLand[1]]  size: {0.5,0.5} position: {0.5,0} refresh: false;
-			image image_file("../includes/scene.jpg")  refresh: false size: player_size position: player_2_position;
-			agents "P2 Tree" value: GPlayLand[1].trees size: player_size position: player_2_position;
+			graphics "image2" refresh: false size: player_size position: player_2_position{
+				draw rectangle(world.shape.height * 1177/1421, world.shape.height) texture:image_file("../includes/scene.png") ;
+			}agents "P2 Tree" value: GPlayLand[1].trees size: player_size position: player_2_position;
 			agents "P2 warning" value: GPlayLand[1].warnings size: player_size position: player_2_position;
 			agents "P2 Pumper" value: GPlayLand[1].pumpers size: player_size position: player_2_position;
 			agents "P2 enemy" value: GPlayLand[1].enemies size: player_size position: player_2_position;
-			agents "P2 fresh water" value: GPlayLand[0].enemies  size: player_size position: player_2_position;
+			agents "P2 fresh water" value: GPlayLand[1].fresh_waters  size: player_size position: player_2_position;
 			agents "P2" value:  unity_player where (each.myland = GPlayLand[1]) transparency: 0.5 size: player_size position: player_2_position;
 		
 			agents "P3 background" value: [GPlayLand[2]]  size: {0.5,0.5} position: {0.0,0.5} refresh: false;
-			image image_file("../includes/scene.jpg") refresh: false  size: player_size position: player_3_position;
-			agents "P3 warning" value: GPlayLand[2].warnings size: player_size position: player_3_position;
+			graphics "image3" refresh: false size: player_size position: player_3_position{
+				draw rectangle(world.shape.height * 1177/1421, world.shape.height) texture:image_file("../includes/scene.png") ;
+			}agents "P3 warning" value: GPlayLand[2].warnings size: player_size position: player_3_position;
 			agents "P3 warning" value: GPlayLand[2].warnings size: player_size position: player_3_position;
 			agents "P3 Pumper" value: GPlayLand[2].pumpers size: player_size position: player_3_position;
 			agents "P3 enemy" value: GPlayLand[2].enemies size: player_size position: player_3_position;
-			agents "P3 fresh water" value: GPlayLand[0].enemies  size: player_size position: player_3_position;
+			agents "P3 fresh water" value: GPlayLand[2].fresh_waters  size: player_size position: player_3_position;
 			agents "P3" value: unity_player where (each.myland = GPlayLand[2]) transparency: 0.5 size: player_size position: player_3_position;
 
 			agents "P4 background" value: [GPlayLand[3]]  size: {0.5,0.5} position: {0.5,0.5} refresh: false;
-			image image_file("../includes/scene.jpg")  refresh: false size: player_size position: player_4_position;
-			agents "P4 Tree" value: GPlayLand[3].trees  size: player_size position: player_4_position;
+			graphics "image4" refresh: false size: player_size position: player_4_position{
+				draw rectangle(world.shape.height * 1177/1421, world.shape.height) texture:image_file("../includes/scene.png") ;
+			}agents "P4 Tree" value: GPlayLand[3].trees  size: player_size position: player_4_position;
 			agents "P4 warning" value: GPlayLand[3].warnings  size: player_size position: player_4_position;
 			agents "P4 Pumper" value: GPlayLand[3].pumpers  size: player_size position: player_4_position;
 			agents "P4 enemy" value: GPlayLand[3].enemies  size: player_size position: player_4_position;
-			agents "P4 fresh water" value: GPlayLand[0].enemies  size: player_size position: player_4_position;
+			agents "P4 fresh water" value: GPlayLand[3].fresh_waters  size: player_size position: player_4_position;
 			agents "P4" value:  unity_player where (each.myland = GPlayLand[3]) transparency: 0.5  size: player_size position: player_4_position;
 		}
 

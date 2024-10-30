@@ -17,7 +17,7 @@ species unity_linker parent: abstract_unity_linker {
 	float min_player_position_update_duration <- 0.1;
 
 	//in this model, information about other player will be automatically sent to the Player at every step, so we set do_info_world to true
-	bool do_send_world <- true;
+	bool do_send_world <- false;
 
 	//number of players in the game
 	int number_players <- 1 max: 1;
@@ -38,21 +38,24 @@ species unity_linker parent: abstract_unity_linker {
 
 
 	point toGAMACoordinate(int x, int y) {
-		float xa <- 3550.0;
-		float xb <- 188639.0;
-		float ya <- -2387.0;
-		float yb <- 151614.0;
+		float xa <- 2426.08;
+		float xb <- 181088.094;
+		float ya <- -2534.754;
+		float yb <- 199992.122;
 		return {x/precision * xa + xb, y/precision * ya + yb};
 	}
 
-	action create_trees(string idP, list<string> idTs, list<int> xs, list<int> ys) {
+	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
 		unity_player Pl <- first(unity_player where (each.name = idP));
-		loop i from: 0 to: length(idTs) -1 {
+		list<string> idTs <- idTsStr split_with(",");
+		list<int> xs <- (xsStr split_with (",")) collect (int(each));
+		list<int> ys <-(ysStr split_with (",")) collect (int(each));
+		loop i from: 0 to: length(idTs) -2 {
 			string idT <- idTs[i];
 			int x <- xs[i];
 			int y <- ys[i];
 			point pt <- toGAMACoordinate(x,y);
-			
+			//write idT + " x: " + (x/precision)  + " y:" + (y/precision) + " pt: " + pt;
 			create tree {
 				_id <- idT;
 				playerLand_ID <- Pl.myland.playerLand_ID;
@@ -60,6 +63,7 @@ species unity_linker parent: abstract_unity_linker {
 				location <- pt;
 			}	
 		}
+		//write sample(GPlayLand[0].trees);
 	}
 	
 	action delete_tree(string idP, string idT) {
@@ -71,6 +75,7 @@ species unity_linker parent: abstract_unity_linker {
 		}
 	}
 	action move_create_pumper(string idP, string idwp, int x, int y) {
+		write sample("move_create_pumper");
 		point pt <- toGAMACoordinate(x,y);
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
@@ -98,58 +103,72 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	
-	action update_salty_water(string idP, list<string> sws, list<int> xs, list<int> ys) {
+	action update_salty_water(string idP, string swsStr, string xsStr, string ysStr) {
+		list<string> sws <- swsStr split_with(",");
+		list<int> xs <- (xsStr split_with (",")) collect (int(each));
+		list<int> ys <-(ysStr split_with (",")) collect (int(each));
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		list<enemy> to_remove <- enemy as list;
-		loop i from: 0 to: length(sws) -1 {
-			string idsw <- sws[i];
-			int x <- xs[i];
-			int y <- ys[i];
-			point pt <- toGAMACoordinate(x,y);
-			enemy sw <- Pl.myland.enemies first_with (each._id = idsw);
-			if (sw != nil) {
-				sw.location <- pt;
-				to_remove >> sw;
-			} else {
-				create enemy {
-					_id <- idsw;
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					Pl.myland.enemies << self;
-					location <- pt;
-				} 
+		if (length(sws) > 1) {
+			loop i from: 0 to: length(sws) -2 {
+				string idsw <- sws[i];
+				int x <- xs[i];
+				int y <- ys[i];
+				point pt <- toGAMACoordinate(x,y);
+				enemy sw <- Pl.myland.enemies first_with (each._id = idsw);
+				if (sw != nil) {
+					sw.location <- pt;
+					to_remove >> sw;
+				} else {
+					create enemy {
+						_id <- idsw;
+						playerLand_ID <- Pl.myland.playerLand_ID;
+						Pl.myland.enemies << self;
+						location <- pt;
+					} 
+				}
 			}
 		}
+		
 		if not empty(to_remove) {
 			ask to_remove {
+				Pl.myland.enemies >> self;
 				do die;
 			}
 		}
 	} 
 	
 	
-	action update_fresh_water(string idP, list<string> fws, list<int> xs, list<int> ys) {
+	action update_fresh_water(string idP,string fwsStr, string xsStr, string ysStr) {
+		list<string> fws <- fwsStr split_with(",");
+		list<int> xs <- (xsStr split_with (",")) collect (int(each));
+		list<int> ys <-(ysStr split_with (",")) collect (int(each));
+		
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		list<freshwater> to_remove <- freshwater as list;
-		loop i from: 0 to: length(fws) -1 {
-			string idfw <- fws[i];
-			int x <- xs[i];
-			int y <- ys[i];
-			point pt <- toGAMACoordinate(x,y);
-			freshwater sw <- Pl.myland.fresh_waters first_with (each._id = idfw);
-			if (sw != nil) {
-				sw.location <- pt;
-				to_remove >> sw;
-			} else {
-				create freshwater {
-					_id <- idfw;
-					playerLand_ID <- Pl.myland.playerLand_ID;
-					Pl.myland.fresh_waters << self;
-					location <- pt;
-				} 
+		if (length(fws) > 1) {
+			loop i from: 0 to: length(fws) -2 {
+				string idfw <- fws[i];
+				int x <- xs[i];
+				int y <- ys[i];
+				point pt <- toGAMACoordinate(x,y);
+				freshwater sw <- Pl.myland.fresh_waters first_with (each._id = idfw);
+				if (sw != nil) {
+					sw.location <- pt;
+					to_remove >> sw;
+				} else {
+					create freshwater {
+						_id <- idfw;
+						playerLand_ID <- Pl.myland.playerLand_ID;
+						Pl.myland.fresh_waters << self;
+						location <- pt;
+					} 
+				}
 			}
 		}
 		if not empty(to_remove) {
 			ask to_remove {
+				Pl.myland.fresh_waters >> self;
 				do die;
 			}
 		}
@@ -162,7 +181,7 @@ species unity_player parent: abstract_unity_player {
 	float player_size <- 1500.0;
 	GPlayLand myland;
 	//color of the player in GAMA
-	rgb color <- myland.my_team.color; 
+	rgb color ; 
 
 	//vision cone distance in GAMA 
 	float cone_distance <- 10.0 * player_size;
@@ -178,7 +197,7 @@ species unity_player parent: abstract_unity_player {
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
-		write myland;
+		color <- myland.my_team.color;
 		myland.cntDem <- 0;
 		myland.subside <- false;
 		do Restart(myland.playerLand_ID);
