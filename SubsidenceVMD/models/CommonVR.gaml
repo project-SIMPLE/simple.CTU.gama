@@ -8,30 +8,8 @@
 
 model CommonVR
 
+import "Global.gaml"  
 
-import "Subsi_Simple2mini1.gaml"
-  
-global {
-//color of the different players
-	list<rgb> color_players <- [#yellow, #green, #violet, #red];
-
- 
-	init {
-	}
-
-	action readVR {
-		ask GPlayLand where (each.subside) {
-			unity_player u <- first(unity_player where (each.myland = self));
-			//			write "" + u;
-//			ask unity_linker {
-//				do send_message players: u as list mes: ["subside"::true];
-//			}
-
-		}
-
-	} 
-
-}
 
 species unity_linker parent: abstract_unity_linker {
 //name of the species used to represent a Unity player
@@ -50,30 +28,14 @@ species unity_linker parent: abstract_unity_linker {
 	//min number of players to start the simulation
 	int min_num_players <- 99999;
 
-	//initial location of the player
-	list<point> init_locations <- define_init_locations();
-	list<point> define_init_locations {
-		return GPlayLand collect each.location; //[{50.0,50.0,0.0}];
-	}
+	
+	
 
 	
 	reflex when: cycle = 0 {
 		do send_message(unity_player as list, ["readyToStart"::""]);
 	}
 
-	//reflex activated only when there is at least one player and every 100 cycles
-	//	reflex send_message when: every(1 #cycle) and not empty(unity_player) {
-	//
-	//	//send a message to all players; the message should be a map (key: name of the attribute; value: value of this attribute)
-	//	//the name of the attribute should be the same as the variable in the serialized class in Unity (c# script) 
-	//	//		write "Send message: "  + cycle;
-	//		do send_message players: unity_player as list mes: ["cycle"::cycle];
-	//	}
-
-	//action that will be called by the Unity player to send a message to the GAMA simulation
-	action receive_message (string id, string mes) {
-	//		write "Player " + id + " send the message: " + mes;
-	}
 
 	point toGAMACoordinate(int x, int y) {
 		float xa <- 3550.0;
@@ -83,14 +45,20 @@ species unity_linker parent: abstract_unity_linker {
 		return {x/precision * xa + xb, y/precision * ya + yb};
 	}
 
-	action create_tree(string idP, string idT, int x, int y) {
-		point pt <- toGAMACoordinate(x,y);
+	action create_trees(string idP, list<string> idTs, list<int> xs, list<int> ys) {
 		unity_player Pl <- first(unity_player where (each.name = idP));
-		create tree {
-			_id <- idT;
-			playerLand_ID <- Pl.myland.playerLand_ID;
-			Pl.myland.trees << self;
-			location <- pt;
+		loop i from: 0 to: length(idTs) -1 {
+			string idT <- idTs[i];
+			int x <- xs[i];
+			int y <- ys[i];
+			point pt <- toGAMACoordinate(x,y);
+			
+			create tree {
+				_id <- idT;
+				playerLand_ID <- Pl.myland.playerLand_ID;
+				Pl.myland.trees << self;
+				location <- pt;
+			}	
 		}
 	}
 	
@@ -98,7 +66,7 @@ species unity_linker parent: abstract_unity_linker {
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		tree t <- Pl.myland.trees first_with (each._id = idT);
 		Pl.myland.trees >> t;
-		ask t {
+		ask t { 
 			do die;
 		}
 	}
@@ -108,12 +76,14 @@ species unity_linker parent: abstract_unity_linker {
 		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
 		if (wp != nil) {
 			wp.location <- pt;
+			wp.my_cell <- cell(wp.location);
 		} else {
 			create Pumper {
 				_id <- idwp;
 				playerLand_ID <- Pl.myland.playerLand_ID;
 				Pl.myland.pumpers << self;
 				location <- pt;
+				my_cell <- cell(location);
 			}
 		} 
 	}
@@ -183,7 +153,7 @@ species unity_linker parent: abstract_unity_linker {
 				do die;
 			}
 		}
-	} 
+	}  
 	
 }
 
@@ -192,9 +162,9 @@ species unity_player parent: abstract_unity_player {
 	float player_size <- 1500.0;
 	GPlayLand myland;
 	//color of the player in GAMA
-	rgb color <- color_players[int(self)];
+	rgb color <- myland.my_team.color; 
 
-	//vision cone distance in GAMA
+	//vision cone distance in GAMA 
 	float cone_distance <- 10.0 * player_size;
 
 	//vision cone amplitude in GAMA
@@ -244,10 +214,6 @@ species unity_player parent: abstract_unity_player {
 
 	aspect default {
 		if to_display {
-			if selected {
-				draw circle(player_size) at: location + {0, 0, z_offset} color: rgb(#blue, 0.5);
-			}
-
 			draw cube(player_size / 2.0) at: location + {0, 0, z_offset} color: color;
 			draw player_perception_cone() color: rgb(color, 0.5);
 		}

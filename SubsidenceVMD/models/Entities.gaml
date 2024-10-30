@@ -1,32 +1,59 @@
 model Entities
-
-
-global {
-	image_file itree <- image_file("../includes/tree.png");
-	list<image_file> itrees <- [image_file("../includes/tree1.png"), image_file("../includes/tree2.png"), image_file("../includes/tree3.png")];
-	image_file iscene <- image_file("../includes/scene.jpg");
-	image_file iscenefull <- image_file("../includes/scenefull.jpg");
-	image_file ipumper <- image_file("../includes/pumper.png");
-	image_file iwarning <- image_file("../includes/warn.png");
-
-
+ 
+ 
+import "Global.gaml" 
+ 
+grid cell file: ground_water_level_grid {
+	list<float> value_players;
+	list<cell> neighbors2;
+	int num_neighbors;	
+	int num_neighbors2;
+	
+	init {
+		neighbors2 <- self neighbors_at 2 - neighbors;
+		num_neighbors <- length(neighbors);
+		num_neighbors2 <- length(neighbors2);
+		
+		loop times: 4 {
+			value_players << grid_value;
+		}
+	}
+	
+	float remove_water(int playerId, float quantity) {
+		float temp <- min(quantity, value_players[playerId]);
+		value_players[playerId] <- value_players[playerId] - temp;
+		return temp;
+	}  
+	reflex refill_water {
+		loop i from: 0 to: 3 {
+			value_players[i] <- min(grid_value,grid_value * refill_rate +  value_players[i]);
+		}
+	}
 }
- 
- 
+
+
+  
+  
  
 species Pumper  {
-	list mysub;
 	int playerLand_ID;
 	string _id;
-	string aquifer; // 'qh', 'qp3'
-	geometry shape <- square(1000);
-
+	cell my_cell;
+	float fresh_water_generation_rate;
 	aspect default {
 		draw cube(1000) texture: ipumper;
 	}
 
-	
-
+	reflex extract_water {
+		float sum_extracted <- my_cell.remove_water(playerLand_ID,  pump_per_step * water_pump_distance[0]);
+		ask my_cell.neighbors {
+			sum_extracted <- sum_extracted + remove_water(myself.playerLand_ID,  pump_per_step * water_pump_distance[1] / num_neighbors);
+		}
+		ask my_cell.neighbors2 {
+			sum_extracted <- sum_extracted + remove_water(myself.playerLand_ID,  pump_per_step * water_pump_distance[2] / num_neighbors2);
+		}
+		fresh_water_generation_rate <- sum_extracted/pump_per_step * max_fresh_water_generation_rate;
+	}
 }
 
 
@@ -51,6 +78,10 @@ species GPlayLand {
 	int current_score;
 
 	int rot <- 0;
+	
+	aspect default {
+		draw world.shape color: my_team.color;
+	}
 
 }
 
