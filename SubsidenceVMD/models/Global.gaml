@@ -25,33 +25,9 @@ global {
 			playerLand_ID <- int(self); 
 			create team with: [color::color_lands[int(self)]] {
 				myself.my_team <- self;
-			} 
+			}  
 		}	
-		
-
 	} 
 	
-	reflex mainReflex2 {
-		do updateSubsidenceAquifer;
-	}
- 
-	action updateSubsidenceAquifer {
-		loop player_temp over: GPlayLand {
-			/*player_temp.volumePump <- player_temp.numberPumper * pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear; // volum hour * hour*days*months m3	
-			//			write "Pump volume of player " + player_temp + ":" + player_temp.volumePump;
-			tmpDepthLose <- player_temp.volumePump / pixelSize; //m
-			ask player_temp.pumpers {
-				Pumper tmpPumper <- self;
-				loop s over: mysub {
-					SubsidenceCell_elevation[geometry(s).location] <- SubsidenceCell_elevation[geometry(s).location] + 100; // rateSubsidence[tmpPumper.aquifer] * tmpDepthLose;
-
-				}
-
-			}
-
-			totalGroundVolumeUsed <- totalGroundVolumeUsed + player_temp.volumePump / 1E6;*/
-		}
-
-	}
 
 }

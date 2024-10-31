@@ -4,7 +4,7 @@ model Entities
 import "Global.gaml" 
  
 grid cell file: ground_water_level_grid {
-	list<float> value_players;
+	list<float> value_water;
 	list<cell> neighbors2;
 	int num_neighbors;	
 	int num_neighbors2;
@@ -15,18 +15,18 @@ grid cell file: ground_water_level_grid {
 		num_neighbors2 <- length(neighbors2);
 		
 		loop times: 4 {
-			value_players << grid_value;
+			value_water << grid_value;
 		}
 	}
 	
 	float remove_water(int playerId, float quantity) {
-		float temp <- min(quantity, value_players[playerId]);
-		value_players[playerId] <- value_players[playerId] - temp;
+		float temp <- min(quantity, value_water[playerId]);
+		value_water[playerId] <- value_water[playerId] - temp;
 		return temp;
 	}  
 	reflex refill_water {
 		loop i from: 0 to: 3 {
-			value_players[i] <- min(grid_value,grid_value * refill_rate +  value_players[i]);
+			value_water[i] <- min(grid_value,grid_value * refill_rate +  value_water[i]);
 		}
 	}
 } 
@@ -63,7 +63,7 @@ species GPlayLand {
 	list<tree> trees;
 	list<freshwater> fresh_waters;
 	list<enemy> enemies;
-	list<warning> warnings;
+	list<enemy_spawner> enemy_spawners;
 	
 	bool subside <- false; 
 	int cntDem <- 0;
@@ -106,14 +106,23 @@ species tree {
 
 }
 
-species warning {
+species enemy_spawner {
 	string _id;
 	int playerLand_ID;
-	int count <- 0;
-
-
+	list<cell> my_cells;
+	float subsidence_area ;
+	float enemy_generation_rate <- 1.0;
+	rgb color <- rnd_color(255);
+	
+	reflex update_enemy_generation_rate {
+		subsidence_area <- my_cells mean_of (each.grid_value - each.value_water[playerLand_ID]);
+		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area);
+	}
+	
 	aspect default {
-		draw iwarning border: #red size: 1000;
+		if (enemy_generation_rate > enemy_generation_rate_visibility_threshold) {
+			draw iwarning border: #red size: 3000 * enemy_generation_rate;
+		}	
 	}
 
 }

@@ -36,5 +36,7 @@ global {
 	list<rgb> color_lands <- [#yellow, #lightgreen, #violet, #red];
 	
 	int pumper_rate_refresh_rate <- 10; // in number of cycles
+	int enemy_genetation_rate_refresh_rate <- 10; // in number of cycles
 
+	float enemy_generation_rate_visibility_threshold <- 0.01;
 }

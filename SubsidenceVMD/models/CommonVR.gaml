@@ -37,9 +37,24 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	reflex send_fresh_water_spawn_rate when: every(pumper_rate_refresh_rate#cycle) {
-		list<string> ids <- Pumper collect each._id;
-		list<float> spawn_rate <- Pumper collect round(precision * each.fresh_water_generation_rate);
-		do send_message(unity_player as list, ["pumpers"::ids, "spawnrates"::spawn_rate]);
+		ask unity_player {
+			list<string> ids <- myland.pumpers collect each._id;
+			list<float> spawn_rate <-  myland.pumpers collect round(myself.precision * each.fresh_water_generation_rate);
+			ask myself {
+				do send_message([myself], ["pumpers"::ids, "spawnrates"::spawn_rate]);
+			}
+		}
+		
+	}
+
+	reflex send_enemy_spawn_rate when: every(enemy_genetation_rate_refresh_rate#cycle) {
+		ask unity_player {
+			list<string> ids <- myland.enemy_spawners collect each._id;
+			list<float> spawn_rate <-  myland.enemy_spawners collect round(myself.precision * each.enemy_generation_rate);
+			ask myself {
+				do send_message([myself], ["enemyspawners"::ids, "spawnrates"::spawn_rate]);
+			}
+		}
 	}
 
 
@@ -59,11 +74,18 @@ species unity_linker parent: abstract_unity_linker {
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
+		ask GPlayLand {
+		 	ask trees{
+				do die;
+			}
+			trees <- [];
+		}
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		list<string> idTs <- idTsStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <-(ysStr split_with (",")) collect (int(each));
-		loop i from: 0 to: length(idTs) -2 {
+		
+		loop i from: 0 to: length(xs) -1 {
 			string idT <- idTs[i];
 			int x <- xs[i];
 			int y <- ys[i];
@@ -88,20 +110,47 @@ species unity_linker parent: abstract_unity_linker {
 		}
 	}
 	
-	action move_create_warning(string idP, string idw, int x, int y) {
-		point pt <- toGAMACoordinate(x,y);
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		warning wp <- Pl.myland.warnings first_with (each._id = idw);
-		if (wp != nil) {
-			wp.location <- pt;
-		} else {
-			create warning {
-				_id <- idw;
-				playerLand_ID <- Pl.myland.playerLand_ID;
-				Pl.myland.warnings << self;
-				location <- pt;
+	action create_enemy_spawners(string idP, string idESStr, string xsStr, string ysStr) {
+		write "create_enemy_spawners: " + xsStr;
+		ask GPlayLand {
+		 	ask enemy_spawners{
+				do die;
 			}
-		} 
+			enemy_spawners <- [];
+		}
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		list<string> idESs <- idESStr split_with(",");
+		list<int> xs <- (xsStr split_with (",")) collect (int(each));
+		list<int> ys <-(ysStr split_with (",")) collect (int(each));
+		list<enemy_spawner> eps;
+		loop i from: 0 to: length(idESs) -1 {
+			string idT <- idESs[i];
+			int x <- xs[i];
+			int y <- ys[i];
+			point pt <- toGAMACoordinate(x,y);
+			create enemy_spawner {
+				_id <- idT;
+				playerLand_ID <- Pl.myland.playerLand_ID;
+				Pl.myland.enemy_spawners << self;
+				location <- pt;
+				eps << self;
+			}	
+		}
+		if (not empty(eps)) {
+			int max_x <- cell max_of each.grid_x;
+			int current_x <- 0;
+			int step_x <- round(max_x/length(eps));
+			map<enemy_spawner,int> esp <- eps as_map (each :: cell(each.location).grid_x);
+			loop i from: 0 to: length(enemy_spawner) - 1 {
+				list<cell> cells <- cell where ((each.grid_x >= current_x) and (each.grid_x <= (current_x + step_x)));
+				int mid <- int(current_x + step_x/2.0);
+				enemy_spawner es <- esp.keys with_min_of abs(mid - esp[each]);
+				es.my_cells <- cells;
+				current_x <- current_x + step_x;
+			}
+		}
+		
+		
 	}
 	
 	action move_create_pumper(string idP, string idwp, int x, int y) {
@@ -139,7 +188,7 @@ species unity_linker parent: abstract_unity_linker {
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		list<enemy> to_remove <- enemy as list;
 		if (length(sws) > 1) {
-			loop i from: 0 to: length(sws) -2 {
+			loop i from: 0 to: length(xs) -1 {
 				string idsw <- sws[i];
 				int x <- xs[i];
 				int y <- ys[i];
@@ -176,7 +225,7 @@ species unity_linker parent: abstract_unity_linker {
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		list<freshwater> to_remove <- freshwater as list;
 		if (length(fws) > 1) {
-			loop i from: 0 to: length(fws) -2 {
+			loop i from: 0 to: length(xs) -1 {
 				string idfw <- fws[i];
 				int x <- xs[i];
 				int y <- ys[i];
@@ -236,7 +285,7 @@ species unity_player parent: abstract_unity_player {
 			do die;
 		}
 
-		ask warning where (each.playerLand_ID = id) {
+		ask enemy_spawner where (each.playerLand_ID = id) {
 			do die;
 		}
 
