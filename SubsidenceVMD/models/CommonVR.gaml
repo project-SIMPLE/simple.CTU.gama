@@ -9,7 +9,7 @@
 model CommonVR
 
 import "Global.gaml"  
-
+  
 
 species unity_linker parent: abstract_unity_linker {
 //name of the species used to represent a Unity player
@@ -32,8 +32,14 @@ species unity_linker parent: abstract_unity_linker {
 	
 
 	
-	reflex when: cycle = 0 {
+	reflex let_player_start when: cycle = 0 {
 		do send_message(unity_player as list, ["readyToStart"::""]);
+	}
+	
+	reflex send_fresh_water_spawn_rate when: every(pumper_rate_refresh_rate#cycle) {
+		list<string> ids <- Pumper collect each._id;
+		list<float> spawn_rate <- Pumper collect round(precision * each.fresh_water_generation_rate);
+		do send_message(unity_player as list, ["pumpers"::ids, "spawnrates"::spawn_rate]);
 	}
 
 
@@ -235,7 +241,7 @@ species unity_player parent: abstract_unity_player {
 
 		ask enemy where (each.playerLand_ID = id) {
 			do die;
-		}
+		} 
 
 	
 		ask Pumper where (each.playerLand_ID = id) {

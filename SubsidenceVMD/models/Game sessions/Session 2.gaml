@@ -1,7 +1,7 @@
 
 model Session2
 
-import "../CommonVR.gaml" 
+import "../CommonVR.gaml"  
   
 
 experiment session2  autorun: false type: unity  {
@@ -21,8 +21,8 @@ experiment session2  autorun: false type: unity  {
 				do create_player(id);
 			}
 		} 
-		
-	} 
+		 
+	}  
 
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
@@ -61,7 +61,7 @@ experiment session2  autorun: false type: unity  {
 			agents "P1 fresh water" value: GPlayLand[0].fresh_waters  size: player_size position: player_1_position;
 			agents "P1" value: unity_player where (each.myland = GPlayLand[0]) transparency: 0.25  size: player_size position: player_1_position;
 			
-		/*	agents "P2 background" value: [GPlayLand[1]]  size: {0.5,0.5} position: {0.5,0} refresh: false;
+			agents "P2 background" value: [GPlayLand[1]]  size: {0.5,0.5} position: {0.5,0} refresh: false;
 			graphics "image2" refresh: false size: player_size position: player_2_position{
 				draw rectangle(world.shape.height * 1177/1421, world.shape.height) texture:image_file("../includes/scene.png") ;
 			}agents "P2 Tree" value: GPlayLand[1].trees size: player_size position: player_2_position;
@@ -90,7 +90,7 @@ experiment session2  autorun: false type: unity  {
 			agents "P4 enemy" value: GPlayLand[3].enemies  size: player_size position: player_4_position;
 			agents "P4 fresh water" value: GPlayLand[3].fresh_waters  size: player_size position: player_4_position;
 			agents "P4" value:  unity_player where (each.myland = GPlayLand[3]) transparency: 0.5  size: player_size position: player_4_position;
-		 */}
+		 }
 
 	}
 

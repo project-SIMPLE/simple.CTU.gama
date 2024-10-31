@@ -6,7 +6,7 @@
 */
 
 
-model Parameters
+model Parameters 
 
 global { 
 	image_file itree <- image_file("../includes/tree.png");
@@ -31,8 +31,10 @@ global {
 	float pumDayperMonth <- 30.0;
 	float pumMonthperYear <- 6.0;
 	list<float> water_pump_distance <- [0.7,0.2,0.1]; //rate of extraction per distance 1,2,3
-	float max_fresh_water_generation_rate <- 0.5;	
-	
+	float reference_fresh_water_generation_time <- 1.0;	
+	float min_fresh_water_generation_time <- 10.0;
 	list<rgb> color_lands <- [#yellow, #lightgreen, #violet, #red];
+	
+	int pumper_rate_refresh_rate <- 10; // in number of cycles
 
 }

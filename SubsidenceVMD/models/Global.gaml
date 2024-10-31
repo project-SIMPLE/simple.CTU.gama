@@ -22,7 +22,7 @@ global {
 	float pump_per_step <-  pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {
 		create GPlayLand number: 4  {
-			playerLand_ID <- int(self);
+			playerLand_ID <- int(self); 
 			create team with: [color::color_lands[int(self)]] {
 				myself.my_team <- self;
 			} 

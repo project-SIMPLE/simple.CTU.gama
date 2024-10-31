@@ -29,7 +29,7 @@ grid cell file: ground_water_level_grid {
 			value_players[i] <- min(grid_value,grid_value * refill_rate +  value_players[i]);
 		}
 	}
-}
+} 
 
 
   
@@ -52,7 +52,7 @@ species Pumper  {
 		ask my_cell.neighbors2 {
 			sum_extracted <- sum_extracted + remove_water(myself.playerLand_ID,  pump_per_step * water_pump_distance[2] / num_neighbors2);
 		}
-		fresh_water_generation_rate <- sum_extracted/pump_per_step * max_fresh_water_generation_rate;
+		fresh_water_generation_rate <- sum_extracted = 0 ? min_fresh_water_generation_time : ((pump_per_step/sum_extracted) * reference_fresh_water_generation_time);
 	}
 }
 
