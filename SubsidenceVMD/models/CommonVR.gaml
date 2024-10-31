@@ -28,7 +28,7 @@ species unity_linker parent: abstract_unity_linker {
 	//min number of players to start the simulation
 	int min_num_players <- 99999;
 
-	
+	list<point> init_locations <- [any_location_in(world) + {0,0,1}];
 	
 
 	
@@ -43,6 +43,12 @@ species unity_linker parent: abstract_unity_linker {
 		float ya <- -2534.754;
 		float yb <- 199992.122;
 		return {x/precision * xa + xb, y/precision * ya + yb};
+	}
+	
+	action update_player_pos(string idP,  int x, int y, int o) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		Pl.location <-  toGAMACoordinate(x,y);
+		Pl.heading <- float(o/precision);
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
@@ -74,8 +80,24 @@ species unity_linker parent: abstract_unity_linker {
 			do die;
 		}
 	}
+	
+	action move_create_warning(string idP, string idw, int x, int y) {
+		point pt <- toGAMACoordinate(x,y);
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		warning wp <- Pl.myland.warnings first_with (each._id = idw);
+		if (wp != nil) {
+			wp.location <- pt;
+		} else {
+			create warning {
+				_id <- idw;
+				playerLand_ID <- Pl.myland.playerLand_ID;
+				Pl.myland.warnings << self;
+				location <- pt;
+			}
+		} 
+	}
+	
 	action move_create_pumper(string idP, string idwp, int x, int y) {
-		write sample("move_create_pumper");
 		point pt <- toGAMACoordinate(x,y);
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
@@ -178,22 +200,21 @@ species unity_linker parent: abstract_unity_linker {
 
 species unity_player parent: abstract_unity_player {
 //size of the player in GAMA
-	float player_size <- 1500.0;
+	float player_size <- 10000.0;
 	GPlayLand myland;
 	//color of the player in GAMA
 	rgb color ; 
 
 	//vision cone distance in GAMA 
-	float cone_distance <- 10.0 * player_size;
+	float cone_distance <- 5.0 * player_size;
 
 	//vision cone amplitude in GAMA
 	float cone_amplitude <- 90.0;
 
 	//rotation to apply from the heading of Unity to GAMA
 	float player_rotation <- 90.0;
-
-	//display the player
-	bool to_display <- true;
+	
+	
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
@@ -226,16 +247,10 @@ species unity_player parent: abstract_unity_player {
 
 	float z_offset <- 2.0;
 
-	reflex ss {
-		heading <- -heading;
-		location <- (location * 100) + myland.location;
-	}
-
+	
 	aspect default {
-		if to_display {
-			draw cube(player_size / 2.0) at: location + {0, 0, z_offset} color: color;
-			draw player_perception_cone() color: rgb(color, 0.5);
-		}
+		draw square(player_size / 2.0) border:#black at: location + {0, 0, z_offset} color: color;
+		draw player_perception_cone()border:#black color: rgb(color, 0.5);
 
 	}
 
