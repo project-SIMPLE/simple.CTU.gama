@@ -16,10 +16,8 @@ experiment session2  autorun: false type: unity  {
 
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
-		if (unity_player first_with (each.name = id)) = nil {
-			ask unity_linker {
-				do create_player(id);
-			}
+		ask unity_linker {
+			do create_player(id);
 		} 
 		 
 	}  

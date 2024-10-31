@@ -19,11 +19,9 @@ species unity_linker parent: abstract_unity_linker {
 	//in this model, information about other player will be automatically sent to the Player at every step, so we set do_info_world to true
 	bool do_send_world <- false;
 
-	//number of players in the game
-	int number_players <- 1 max: 1;
-
+	
 	//max number of players that can play the game
-	int max_num_players <- number_players;
+	int max_num_players <- 99999;
 
 	//min number of players to start the simulation
 	int min_num_players <- 99999;
@@ -33,7 +31,28 @@ species unity_linker parent: abstract_unity_linker {
 
 	
 	reflex let_player_start when: cycle = 0 {
-		do send_message(unity_player as list, ["readyToStart"::""]);
+		float t <- gama.machine_time;
+		float time_to_connect <- 10000.0;
+		float tentative_connect <- 500.0;
+		float tentative_connect_current <- tentative_connect;
+		loop while: gama.machine_time - t < time_to_connect {
+			float tt <- gama.machine_time;
+			list<unity_player> to_init <- unity_player where not each.ready_to_start;
+			if tentative_connect_current <= 0 and not empty(to_init) {
+				unity_player p <- one_of(to_init);
+				write sample(p);
+				do send_message([p], ["readyToStart"::""]);
+				tentative_connect_current <- tentative_connect;
+			}
+			tentative_connect_current <- tentative_connect_current - gama.machine_time - tt;
+			
+			
+		}
+	}
+	
+	action player_ready(string idP) {
+		unity_player Pl <- first(unity_player where (each.name = idP));
+		Pl.ready_to_start <- true;
 	}
 	
 	reflex send_fresh_water_spawn_rate when: every(pumper_rate_refresh_rate#cycle) {
@@ -271,6 +290,8 @@ species unity_player parent: abstract_unity_player {
 	float player_rotation <- 90.0;
 	
 	bool to_display <- false;
+	
+	bool ready_to_start <- false;
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
