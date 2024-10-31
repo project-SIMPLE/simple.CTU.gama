@@ -55,6 +55,7 @@ species unity_linker parent: abstract_unity_linker {
 		unity_player Pl <- first(unity_player where (each.name = idP));
 		Pl.location <-  toGAMACoordinate(x,y);
 		Pl.heading <- float(o/precision);
+		Pl.to_display <- true;
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
@@ -220,7 +221,7 @@ species unity_player parent: abstract_unity_player {
 	//rotation to apply from the heading of Unity to GAMA
 	float player_rotation <- 90.0;
 	
-	
+	bool to_display <- false;
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
@@ -255,9 +256,12 @@ species unity_player parent: abstract_unity_player {
 
 	
 	aspect default {
-		draw square(player_size / 2.0) border:#black at: location + {0, 0, z_offset} color: color;
-		draw player_perception_cone()border:#black color: rgb(color, 0.5);
-
+		if (to_display) {
+			draw square(player_size / 2.0) border:#black at: location + {0, 0, z_offset} color: color;
+			draw player_perception_cone()border:#black color: rgb(color, 0.5);
+			
+		}
+	
 	}
 
 }
