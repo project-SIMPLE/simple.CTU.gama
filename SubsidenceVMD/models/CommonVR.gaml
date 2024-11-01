@@ -31,7 +31,8 @@ species unity_linker parent: abstract_unity_linker {
 
 	
 	reflex let_player_start when: cycle = 0 {
-		float t <- gama.machine_time;
+		do send_message(unity_player as list, ["readyToStart"::""]);
+		/*float t <- gama.machine_time;
 		float time_to_connect <- 10000.0;
 		float tentative_connect <- 500.0;
 		float tentative_connect_current <- tentative_connect;
@@ -40,14 +41,13 @@ species unity_linker parent: abstract_unity_linker {
 			list<unity_player> to_init <- unity_player where not each.ready_to_start;
 			if tentative_connect_current <= 0 and not empty(to_init) {
 				unity_player p <- one_of(to_init);
-				write sample(p);
 				do send_message([p], ["readyToStart"::""]);
 				tentative_connect_current <- tentative_connect;
 			}
 			tentative_connect_current <- tentative_connect_current - gama.machine_time - tt;
 			
 			
-		}
+		}*/
 	}
 	
 	action player_ready(string idP) {
@@ -130,7 +130,6 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	action create_enemy_spawners(string idP, string idESStr, string xsStr, string ysStr) {
-		write "create_enemy_spawners: " + xsStr;
 		ask GPlayLand {
 		 	ask enemy_spawners{
 				do die;

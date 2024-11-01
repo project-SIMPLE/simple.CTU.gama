@@ -96,7 +96,7 @@ species tree {
 	string _id;
 	int playerLand_ID;
 	int iid;
-	int isz <- 10000;
+	int isz <- 30000;
 
 	aspect default {
 	//		draw itree size: 300;

@@ -32,9 +32,6 @@ experiment session2  autorun: false type: unity  {
 		} 
 
 	}
-
-	//variable used to avoid to move too fast the player agent
-	float t_ref;
 	
 	
 	point player_size <- {0.45,0.45};
