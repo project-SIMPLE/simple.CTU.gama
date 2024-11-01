@@ -29,9 +29,10 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- [any_location_in(world) + {0,0,1}];
 	
 
-	
-	reflex let_player_start when: cycle = 0 {
-		do send_message(unity_player as list, ["readyToStart"::""]);
+
+	reflex let_player_start when: not empty(unity_player where !each.ready_to_start){
+		//write sample(unity_player where !each.ready_to_start);
+		do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
 		/*float t <- gama.machine_time;
 		float time_to_connect <- 10000.0;
 		float tentative_connect <- 500.0;
@@ -50,8 +51,42 @@ species unity_linker parent: abstract_unity_linker {
 		}*/
 	}
 	
+	action restart(string id) {
+		unity_player Pl <- player_agents[id];
+		ask Pl.myland.trees {
+			do die;
+		}
+		ask Pl.myland.pumpers {
+			do die;
+		}
+		ask Pl.myland.fresh_waters {
+			do die;
+		}
+		ask Pl.myland.enemies {
+			do die;
+		}
+		ask Pl.myland.enemy_spawners {
+			do die;
+		}
+		
+		Pl.myland.pumpers <- [];
+		Pl.myland.trees <- [];
+		Pl.myland.fresh_waters <- [];
+		Pl.myland.enemies <- [];
+		Pl.myland.enemy_spawners <- [];
+		ask cell {
+			water_level[Pl.myland.playerLand_ID] <- grid_value;
+		}
+		Pl.ready_to_start <- false;
+	}
+	
+	action change_state(string idP, string new_state) {
+		unity_player Pl <- player_agents[idP];
+		Pl.current_state <- new_state;
+	}
+	
 	action player_ready(string idP) {
-		unity_player Pl <- first(unity_player where (each.name = idP));
+		unity_player Pl <- player_agents[idP];
 		Pl.ready_to_start <- true;
 	}
 	
@@ -76,6 +111,23 @@ species unity_linker parent: abstract_unity_linker {
 		}
 	}
 
+	reflex send_info_subsidence when: every(update_subsidence_refresh_rate#cycle) {
+		list<float> waters <-list_with(length(GPlayLand), 0.0);
+		float sum_water_init <- cell sum_of (each.grid_value);
+		ask cell {
+			loop i from: 0 to: length(GPlayLand) -1 {
+				waters[i] <- waters[i] + water_level[i];
+			}
+		}
+		ask unity_player {
+			
+			list<int> subsidence_values <- cell collect each.subsidence(myland.playerLand_ID);
+			ask myself {
+				do send_message([myself], ["subsidences"::subsidence_values,"waterGlobal"::round(precision * sum(waters)/(length(GPlayLand) * sum_water_init)), "waterLocal"::round(precision * waters[myself.myland.playerLand_ID]/ sum_water_init)]);
+			}
+		}
+	}
+
 
 	point toGAMACoordinate(int x, int y) {
 		float xa <- 2426.08;
@@ -86,7 +138,7 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	action update_player_pos(string idP,  int x, int y, int o) {
-		unity_player Pl <- first(unity_player where (each.name = idP));
+		unity_player Pl <- player_agents[idP];
 		Pl.location <-  toGAMACoordinate(x,y);
 		Pl.heading <- float(o/precision);
 		Pl.to_display <- true;
@@ -99,7 +151,7 @@ species unity_linker parent: abstract_unity_linker {
 			}
 			trees <- [];
 		}
-		unity_player Pl <- first(unity_player where (each.name = idP));
+		unity_player Pl <- player_agents[idP];
 		list<string> idTs <- idTsStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <-(ysStr split_with (",")) collect (int(each));
@@ -113,7 +165,7 @@ species unity_linker parent: abstract_unity_linker {
 			create tree {
 				_id <- idT;
 				playerLand_ID <- Pl.myland.playerLand_ID;
-				Pl.myland.trees << self;
+				Pl.myland.trees[idT] <- self;
 				location <- pt;
 			}	
 		}
@@ -121,12 +173,16 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	action delete_tree(string idP, string idT) {
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		tree t <- Pl.myland.trees first_with (each._id = idT);
-		Pl.myland.trees >> t;
-		ask t { 
-			do die;
-		}
+		unity_player Pl <- player_agents[idP];
+		tree t <- Pl.myland.trees[idT];
+		if (t != nil ){
+				remove key: idT from: Pl.myland.trees ;
+			ask t { 
+				do die;
+			}
+		} 
+	
+		
 	}
 	
 	action create_enemy_spawners(string idP, string idESStr, string xsStr, string ysStr) {
@@ -136,7 +192,7 @@ species unity_linker parent: abstract_unity_linker {
 			}
 			enemy_spawners <- [];
 		}
-		unity_player Pl <- first(unity_player where (each.name = idP));
+		unity_player Pl <- player_agents[idP];
 		list<string> idESs <- idESStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <-(ysStr split_with (",")) collect (int(each));
@@ -149,7 +205,7 @@ species unity_linker parent: abstract_unity_linker {
 			create enemy_spawner {
 				_id <- idT;
 				playerLand_ID <- Pl.myland.playerLand_ID;
-				Pl.myland.enemy_spawners << self;
+				Pl.myland.enemy_spawners[idT] <- self;
 				location <- pt;
 				eps << self;
 			}	
@@ -173,8 +229,8 @@ species unity_linker parent: abstract_unity_linker {
 	
 	action move_create_pumper(string idP, string idwp, int x, int y) {
 		point pt <- toGAMACoordinate(x,y);
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
+		unity_player Pl <- player_agents[idP];
+		Pumper wp <- Pl.myland.pumpers[idwp];
 		if (wp != nil) {
 			wp.location <- pt;
 			wp.my_cell <- cell(wp.location);
@@ -182,19 +238,22 @@ species unity_linker parent: abstract_unity_linker {
 			create Pumper {
 				_id <- idwp;
 				playerLand_ID <- Pl.myland.playerLand_ID;
-				Pl.myland.pumpers << self;
+				Pl.myland.pumpers[idwp] <- self;
 				location <- pt;
 				my_cell <- cell(location);
-			}
-		} 
+			} 
+		}
+		
 	}
 	
 	action delete_water_pump(string idP, string idwp) {
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		Pumper wp <- Pl.myland.pumpers first_with (each._id = idwp);
-		Pl.myland.pumpers >> wp;
-		ask wp {
-			do die;
+		unity_player Pl <- player_agents[idP];
+		Pumper wp <- Pl.myland.pumpers[idwp];
+		remove key:idwp from: Pl.myland.pumpers ;
+		if not dead(wp) {
+			ask wp {
+				do die;
+			}
 		}
 	}
 	
@@ -203,15 +262,15 @@ species unity_linker parent: abstract_unity_linker {
 		list<string> sws <- swsStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <-(ysStr split_with (",")) collect (int(each));
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		list<enemy> to_remove <- enemy as list;
+		unity_player Pl <- player_agents[idP];
+		list<enemy> to_remove <- copy(Pl.myland.enemies.values);
 		if (length(sws) > 1) {
 			loop i from: 0 to: length(xs) -1 {
 				string idsw <- sws[i];
 				int x <- xs[i];
 				int y <- ys[i];
 				point pt <- toGAMACoordinate(x,y);
-				enemy sw <- Pl.myland.enemies first_with (each._id = idsw);
+				enemy sw <- Pl.myland.enemies[idsw];
 				if (sw != nil) {
 					sw.location <- pt;
 					to_remove >> sw;
@@ -219,16 +278,17 @@ species unity_linker parent: abstract_unity_linker {
 					create enemy {
 						_id <- idsw;
 						playerLand_ID <- Pl.myland.playerLand_ID;
-						Pl.myland.enemies << self;
+						Pl.myland.enemies[idsw] <- self;
 						location <- pt;
 					} 
 				}
+				
 			}
 		}
 		
 		if not empty(to_remove) {
 			ask to_remove {
-				Pl.myland.enemies >> self;
+				remove key: _id from: Pl.myland.enemies;
 				do die;
 			}
 		}
@@ -238,17 +298,16 @@ species unity_linker parent: abstract_unity_linker {
 	action update_fresh_water(string idP,string fwsStr, string xsStr, string ysStr) {
 		list<string> fws <- fwsStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
-		list<int> ys <-(ysStr split_with (",")) collect (int(each));
-		
-		unity_player Pl <- first(unity_player where (each.name = idP));
-		list<freshwater> to_remove <- freshwater as list;
+		list<int> ys <-(ysStr split_with (",")) collect (int(each));	
+		unity_player Pl <- player_agents[idP];
+		list<freshwater> to_remove <- copy(Pl.myland.fresh_waters.values);
 		if (length(fws) > 1) {
 			loop i from: 0 to: length(xs) -1 {
 				string idfw <- fws[i];
 				int x <- xs[i];
 				int y <- ys[i];
 				point pt <- toGAMACoordinate(x,y);
-				freshwater sw <- Pl.myland.fresh_waters first_with (each._id = idfw);
+				freshwater sw <- Pl.myland.fresh_waters[idfw];
 				if (sw != nil) {
 					sw.location <- pt;
 					to_remove >> sw;
@@ -256,15 +315,15 @@ species unity_linker parent: abstract_unity_linker {
 					create freshwater {
 						_id <- idfw;
 						playerLand_ID <- Pl.myland.playerLand_ID;
-						Pl.myland.fresh_waters << self;
-						location <- pt;
-					} 
+						Pl.myland.fresh_waters[idfw] <- self;
+						location <- pt; 
+					}
 				}
 			}
 		}
 		if not empty(to_remove) {
 			ask to_remove {
-				Pl.myland.fresh_waters >> self;
+				remove key: _id from: Pl.myland.fresh_waters;
 				do die;
 			}
 		}
@@ -291,6 +350,8 @@ species unity_player parent: abstract_unity_player {
 	bool to_display <- false;
 	
 	bool ready_to_start <- false;
+	
+	string current_state;
 
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];

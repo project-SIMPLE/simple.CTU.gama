@@ -5,6 +5,6 @@
   "model_file_path": "./models/Game sessions/Session 2.gaml",
   "experiment_name": "session2", 
   "minimal_players": "0", 
-  "maximal_players": "5", 
+  "maximal_players": "4", 
   "selected_monitoring": "gama_screen"
 }

@@ -4,29 +4,36 @@ model Entities
 import "Global.gaml" 
  
 grid cell file: ground_water_level_grid {
-	list<float> value_water;
+	list<float> water_level;
 	list<cell> neighbors2;
 	int num_neighbors;	
 	int num_neighbors2;
-	
 	init {
 		neighbors2 <- self neighbors_at 2 - neighbors;
 		num_neighbors <- length(neighbors);
 		num_neighbors2 <- length(neighbors2);
 		
 		loop times: 4 {
-			value_water << grid_value;
+			water_level << grid_value;
 		}
 	}
 	
+	float subsidence(int player_land_id)
+	 {
+	 	return grid_value - water_level[player_land_id];
+	 	
+	 }
+	
+	
 	float remove_water(int playerId, float quantity) {
-		float temp <- min(quantity, value_water[playerId]);
-		value_water[playerId] <- value_water[playerId] - temp;
+		float temp <- min(quantity, water_level[playerId]);
+		water_level[playerId] <- water_level[playerId] - temp;
 		return temp;
 	}  
+	
 	reflex refill_water {
 		loop i from: 0 to: 3 {
-			value_water[i] <- min(grid_value,grid_value * refill_rate +  value_water[i]);
+			water_level[i] <- min(grid_value,grid_value * refill_rate +  water_level[i]);
 		}
 	}
 } 
@@ -59,11 +66,11 @@ species Pumper  {
 
 species GPlayLand {
 	int playerLand_ID;
-	list<Pumper> pumpers;
-	list<tree> trees;
-	list<freshwater> fresh_waters;
-	list<enemy> enemies;
-	list<enemy_spawner> enemy_spawners;
+	map<string,Pumper> pumpers;
+	map<string,tree> trees;
+	map<string,freshwater> fresh_waters;
+	map<string,enemy> enemies;
+	map<string,enemy_spawner> enemy_spawners;
 	
 	bool subside <- false; 
 	int cntDem <- 0;
@@ -115,7 +122,7 @@ species enemy_spawner {
 	rgb color <- rnd_color(255);
 	
 	reflex update_enemy_generation_rate {
-		subsidence_area <- my_cells mean_of (each.grid_value - each.value_water[playerLand_ID]);
+		subsidence_area <- my_cells mean_of (each.subsidence(playerLand_ID));
 		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area);
 	}
 	

@@ -10,7 +10,7 @@ model GenerateUnderGroundWater
 global {
 	grid_file volumeqp3_file <- grid_file("../includes/groundwater/2_volume_qp3_500.tif");
 	
-	int dimension <- 50;
+	int dimension <- 10;
 	geometry shape <- envelope(volumeqp3_file);
 	
 	init {

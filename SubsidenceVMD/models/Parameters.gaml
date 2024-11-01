@@ -37,6 +37,7 @@ global {
 	
 	int pumper_rate_refresh_rate <- 10; // in number of cycles
 	int enemy_genetation_rate_refresh_rate <- 10; // in number of cycles
+	int update_subsidence_refresh_rate <- 7;
 
 	float enemy_generation_rate_visibility_threshold <- 0.01;
 }
