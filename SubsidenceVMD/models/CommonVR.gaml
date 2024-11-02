@@ -176,7 +176,9 @@ species unity_linker parent: abstract_unity_linker {
 		unity_player Pl <- player_agents[idP];
 		tree t <- Pl.myland.trees[idT];
 		if (t != nil ){
-				remove key: idT from: Pl.myland.trees ;
+				remove key: idT from: Pl.myland.trees ;				
+				Pl.myland.deadtrees<-Pl.myland.deadtrees+1;
+				
 			ask t { 
 				do die;
 			}
@@ -252,7 +254,7 @@ species unity_linker parent: abstract_unity_linker {
 		remove key:idwp from: Pl.myland.pumpers ;
 		if not dead(wp) {
 			ask wp {
-				do die;
+//				do die;
 			}
 		}
 	}
@@ -358,6 +360,7 @@ species unity_player parent: abstract_unity_player {
 		color <- myland.my_team.color;
 		myland.cntDem <- 0;
 		myland.subside <- false;
+		myland.deadtrees<-0;
 		do Restart(myland.playerLand_ID);
 	}
 

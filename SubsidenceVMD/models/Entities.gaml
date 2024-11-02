@@ -68,6 +68,7 @@ species GPlayLand {
 	int playerLand_ID;
 	map<string,Pumper> pumpers;
 	map<string,tree> trees;
+	int deadtrees<-0;
 	map<string,freshwater> fresh_waters;
 	map<string,enemy> enemies;
 	map<string,enemy_spawner> enemy_spawners;
