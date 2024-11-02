@@ -6,6 +6,7 @@ import "Entities.gaml"
 
 global { 
 	float total_waterused <- 0.0; //total water used 
+		date starting_date <- date("2024-11-30-00-00-00");	 
 	
 	
 	geometry shape <- envelope(ground_water_level_grid);

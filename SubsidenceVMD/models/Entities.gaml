@@ -31,11 +31,11 @@ grid cell file: ground_water_level_grid {
 		return temp;
 	}  
 	
-	reflex refill_water {
-		loop i from: 0 to: 3 {
-			water_level[i] <- min(grid_value,grid_value * refill_rate +  water_level[i]);
-		}
-	}
+//	reflex refill_water {
+//		loop i from: 0 to: 3 {
+//			water_level[i] <- min(grid_value,grid_value * refill_rate +  water_level[i]);
+//		}
+//	}
 } 
 
 
@@ -129,7 +129,7 @@ species enemy_spawner {
 	
 	aspect default {
 		if (enemy_generation_rate > enemy_generation_rate_visibility_threshold) {
-			draw iwarning border: #red size: 3000 * enemy_generation_rate;
+			draw iwarning border: #red size: 30000 * enemy_generation_rate;
 		}	
 	}
 
