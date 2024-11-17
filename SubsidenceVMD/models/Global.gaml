@@ -18,7 +18,7 @@ global {
 	//salt water quantity level
 	float saltwaterQuantity <- 1.0;
 
-
+	int maxGameT<-26;
 	
 	float pump_per_step <-  pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {
@@ -29,6 +29,4 @@ global {
 			}  
 		}	
 	} 
-	
-
 }

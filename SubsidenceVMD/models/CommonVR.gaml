@@ -68,7 +68,11 @@ species unity_linker parent: abstract_unity_linker {
 		ask Pl.myland.enemy_spawners {
 			do die;
 		}
-		
+		Pl.myland.started<-false;
+		Pl.myland.cntTime <- maxGameT;
+		Pl.myland.cntDem <- 0;
+		Pl.myland.subside <- false;
+	    Pl.myland.deadtrees<-0;
 		Pl.myland.pumpers <- [];
 		Pl.myland.trees <- [];
 		Pl.myland.fresh_waters <- [];
@@ -134,24 +138,26 @@ species unity_linker parent: abstract_unity_linker {
 		float xb <- 181088.094;
 		float ya <- -2534.754;
 		float yb <- 199992.122;
-		return {x/precision * xa + xb, y/precision * ya + yb};
+		return {x/precision * xa + xb, y/precision * ya + yb};  
+//		return {y/precision * ya + yb,x/precision * xa + xb };
 	}
 	
 	action update_player_pos(string idP,  int x, int y, int o) {
 		unity_player Pl <- player_agents[idP];
 		Pl.location <-  toGAMACoordinate(x,y);
-		Pl.heading <- float(o/precision);
+		Pl.heading <- float(o/precision)+90;
 		Pl.to_display <- true;
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
-		ask GPlayLand {
-		 	ask trees{
-				do die;
-			}
-			trees <- [];
-		}
+//		ask GPlayLand {
+//		 	ask trees{
+//				do die;
+//			}
+//			trees <- [];
+//		}
 		unity_player Pl <- player_agents[idP];
+		Pl.myland.started<-true;
 		list<string> idTs <- idTsStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <-(ysStr split_with (",")) collect (int(each));
@@ -188,12 +194,12 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	action create_enemy_spawners(string idP, string idESStr, string xsStr, string ysStr) {
-		ask GPlayLand {
-		 	ask enemy_spawners{
-				do die;
-			}
-			enemy_spawners <- [];
-		}
+//		ask GPlayLand {
+//		 	ask enemy_spawners{
+//				do die;
+//			}
+//			enemy_spawners <- [];
+//		}
 		unity_player Pl <- player_agents[idP];
 		list<string> idESs <- idESStr split_with(",");
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
@@ -347,7 +353,7 @@ species unity_player parent: abstract_unity_player {
 	float cone_amplitude <- 90.0;
 
 	//rotation to apply from the heading of Unity to GAMA
-	float player_rotation <- 90.0;
+	float player_rotation <- -90.0;
 	
 	bool to_display <- false;
 	
@@ -358,9 +364,6 @@ species unity_player parent: abstract_unity_player {
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
 		color <- myland.my_team.color;
-		myland.cntDem <- 0;
-		myland.subside <- false;
-		myland.deadtrees<-0;
 		do Restart(myland.playerLand_ID);
 	}
 
@@ -382,6 +385,12 @@ species unity_player parent: abstract_unity_player {
 			do die;
 		}
 
+		myland.cntTime <- maxGameT;
+		myland.cntDem <- 0;
+		myland.subside <- false;
+		myland.deadtrees<-0;
+		
+		myland.started<-false;
 
 	}
 
@@ -391,7 +400,7 @@ species unity_player parent: abstract_unity_player {
 	aspect default {
 		if (to_display) {
 			draw square(player_size / 2.0) border:#black at: location + {0, 0, z_offset} color: color;
-			draw player_perception_cone()border:#black color: rgb(color, 0.5);
+			draw player_perception_cone() border:#black color: rgb(color, 0.5);
 			
 		}
 	
