@@ -198,7 +198,7 @@ experiment session2 autorun: false type: unity {
 	point player_3_position <- {0.025, 0.525};
 	point player_4_position <- {0.525, 0.525};
 	output synchronized: true {
-		layout #split consoles: true parameters: true toolbars: true tabs: true controls: true;
+		layout #split consoles: false parameters: false toolbars: false tabs: false controls: false;
 		display "P1" type: 3d axes: false {
 			camera 'default' location: {182997.1146, 136750.0, 165319.368} target: {183000.0, 136750.0, 0.0};
 			graphics "image11" refresh: true {
