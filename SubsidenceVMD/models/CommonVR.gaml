@@ -29,26 +29,9 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- [any_location_in(world) + {0,0,1}];
 	
 
-
 	reflex let_player_start when: not empty(unity_player where !each.ready_to_start){
-		//write sample(unity_player where !each.ready_to_start);
 		do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
-		/*float t <- gama.machine_time;
-		float time_to_connect <- 10000.0;
-		float tentative_connect <- 500.0;
-		float tentative_connect_current <- tentative_connect;
-		loop while: gama.machine_time - t < time_to_connect {
-			float tt <- gama.machine_time;
-			list<unity_player> to_init <- unity_player where not each.ready_to_start;
-			if tentative_connect_current <= 0 and not empty(to_init) {
-				unity_player p <- one_of(to_init);
-				do send_message([p], ["readyToStart"::""]);
-				tentative_connect_current <- tentative_connect;
-			}
-			tentative_connect_current <- tentative_connect_current - gama.machine_time - tt;
-			
-			
-		}*/
+		
 	}
 	
 	action restart(string id) {
@@ -95,7 +78,7 @@ species unity_linker parent: abstract_unity_linker {
 	}
 	
 	reflex send_fresh_water_spawn_rate when: every(pumper_rate_refresh_rate#cycle) {
-		ask unity_player {
+		ask unity_player where not (dead(each) and each.ready_to_start) {
 			list<string> ids <- myland.pumpers collect each._id;
 			list<float> spawn_rate <-  myland.pumpers collect round(myself.precision * each.fresh_water_generation_rate);
 			ask myself {
@@ -106,7 +89,7 @@ species unity_linker parent: abstract_unity_linker {
 	}
 
 	reflex send_enemy_spawn_rate when: every(enemy_genetation_rate_refresh_rate#cycle) {
-		ask unity_player {
+		ask unity_player where not (dead(each) and each.ready_to_start){
 			list<string> ids <- myland.enemy_spawners collect each._id;
 			list<float> spawn_rate <-  myland.enemy_spawners collect round(myself.precision * each.enemy_generation_rate);
 			ask myself {
@@ -123,7 +106,7 @@ species unity_linker parent: abstract_unity_linker {
 				waters[i] <- waters[i] + water_level[i];
 			}
 		}
-		ask unity_player {
+		ask unity_player where not (dead(each) and each.ready_to_start){
 			
 			list<int> subsidence_values <- cell collect each.subsidence(myland.playerLand_ID);
 			ask myself {

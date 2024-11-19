@@ -160,6 +160,11 @@ experiment session2 autorun: false type: unity {
 
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
+		write "create_player: " + id;
+		
+		if (id in first(unity_linker).player_agents.keys) {
+			do remove_player(id);
+		}
 		ask unity_linker {
 			do create_player(id);
 		}
@@ -168,9 +173,17 @@ experiment session2 autorun: false type: unity {
 
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
+		write "remove_plater: " + id_input;
 		if (not empty(unity_player)) {
-			ask first(unity_player where (each.name = id_input)) {
-				do die;
+			ask unity_linker {
+				if (id_input in player_agents.keys) {
+					do restart(id_input);
+					ask unity_player(player_agents[id_input]) {
+						do die;	
+					}
+					remove key:id_input from: player_agents ;
+				}
+				
 			}
 
 		}
@@ -185,7 +198,7 @@ experiment session2 autorun: false type: unity {
 	point player_3_position <- {0.025, 0.525};
 	point player_4_position <- {0.525, 0.525};
 	output synchronized: true {
-		layout #split consoles: false parameters: false toolbars: false tabs: false controls: false;
+		layout #split consoles: true parameters: true toolbars: true tabs: true controls: true;
 		display "P1" type: 3d axes: false {
 			camera 'default' location: {182997.1146, 136750.0, 165319.368} target: {183000.0, 136750.0, 0.0};
 			graphics "image11" refresh: true {
