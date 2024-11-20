@@ -36,7 +36,7 @@ species unity_linker parent: abstract_unity_linker {
 	
 	action new_connection(string id) {
 		if (id in player_agents.keys) {
-			if (restart_game_in_case_of_deconnection) {
+			if (not let_gama_manage_game) {
 				do restart(id);
 				ask unity_player(player_agents[id]) {
 					do die;	
@@ -46,7 +46,7 @@ species unity_linker parent: abstract_unity_linker {
 			} else {
 				
 			}
-		}
+		} 
 	}
 	
 	action restart(string id) {
@@ -67,7 +67,6 @@ species unity_linker parent: abstract_unity_linker {
 			do die;
 		} 
 		Pl.myland.started<-false;
-		Pl.myland.cntTime <- maxGameT;
 		Pl.myland.cntDem <- 0;
 		Pl.myland.subside <- false;
 	    Pl.myland.deadtrees<-0;
@@ -140,11 +139,12 @@ species unity_linker parent: abstract_unity_linker {
 //		return {y/precision * ya + yb,x/precision * xa + xb };
 	}
 	
-	action update_player_pos(string idP,  int x, int y, int o) {
+	action update_player_pos(string idP,  int x, int y, int o, int remaining_time) {
 		unity_player Pl <- player_agents[idP];
 		Pl.location <-  toGAMACoordinate(x,y);
 		Pl.heading <- float(o/precision)+90;
 		Pl.to_display <- true;
+		Pl.myland.cntTime <- max(0,remaining_time);
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
@@ -362,7 +362,7 @@ species unity_player parent: abstract_unity_player {
 	init {
 		myland <- GPlayLand[length(unity_player) - 1];
 		color <- myland.my_team.color;
-		do Restart(myland.playerLand_ID);
+		do Restart(myland.playerLand_ID); 
 	}
 
 	action Restart (int id) {
@@ -383,7 +383,6 @@ species unity_player parent: abstract_unity_player {
 			do die;
 		}
 
-		myland.cntTime <- maxGameT;
 		myland.cntDem <- 0;
 		myland.subside <- false;
 		myland.deadtrees<-0;

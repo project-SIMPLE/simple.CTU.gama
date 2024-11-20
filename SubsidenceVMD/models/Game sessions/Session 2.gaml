@@ -26,7 +26,7 @@ global {
   
 experiment session2 autorun: true type: unity {
 //minimal time between two simulation step
-	float minimum_cycle_duration <- 0.01;
+	float minimum_cycle_duration <- 0.01; 
 
 	//name of the species used for the unity_linker
 	string unity_linker_species <- string(unity_linker);
@@ -34,8 +34,7 @@ experiment session2 autorun: true type: unity {
 	//allow to hide the "map" display and to only display the displayVR display 
 	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
 
-	parameter "restart_game_in_case_of_deconnection" var: restart_game_in_case_of_deconnection <- true among:[true];
-	parameter "let_gama_manage_time" var: let_gama_manage_time <- false among:[false];
+	parameter "let_gama_manage_time" var: let_gama_manage_game <- false among:[false];
 
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {

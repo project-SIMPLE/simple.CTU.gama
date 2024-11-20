@@ -70,7 +70,6 @@ species GPlayLand {
 	map<string, enemy> enemies;
 	map<string, enemy_spawner> enemy_spawners;
 	bool subside <- false;
-	int cntTime <- maxGameT;
 	int cntDem <- 0;
 	int numberPumper <- 1;
 	int numberLake <- 1;
@@ -83,13 +82,7 @@ species GPlayLand {
 	int remaining_time <- 18000;
 	int current_score;
 	int rot <- 0;
-
-	reflex when: started and every(10 #seconds) {
-		if (cntTime > 0) {
-			cntTime <- cntTime - 1;
-		}
-
-	}
+	int cntTime;
 
 	aspect default {
 		draw world.shape color: my_team.color;

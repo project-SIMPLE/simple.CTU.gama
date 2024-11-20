@@ -16,12 +16,9 @@ global {
 	float totalGroundVolumeUsed <- 0.0;
 
 	//salt water quantity level
-	float saltwaterQuantity <- 1.0;
+	float saltwaterQuantity <- 1.0; 
 
-	int maxGameT<-26;
-	
-	bool restart_game_in_case_of_deconnection;
-	bool let_gama_manage_time ;
+	bool let_gama_manage_game ;
 	
 	
 	
@@ -30,7 +27,7 @@ global {
 		create GPlayLand number: 4  {
 			playerLand_ID <- int(self); 
 			create team with: [color::color_lands[int(self)]] {
-				myself.my_team <- self;
+				myself.my_team <- self; 
 			}  
 		}	
 	} 
