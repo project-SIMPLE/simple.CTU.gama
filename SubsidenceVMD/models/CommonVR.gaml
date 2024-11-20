@@ -34,6 +34,21 @@ species unity_linker parent: abstract_unity_linker {
 		
 	}
 	
+	action new_connection(string id) {
+		if (id in player_agents.keys) {
+			if (restart_game_in_case_of_deconnection) {
+				do restart(id);
+				ask unity_player(player_agents[id]) {
+					do die;	
+				}
+				remove key:id from: player_agents ;
+				do create_player(id);
+			} else {
+				
+			}
+		}
+	}
+	
 	action restart(string id) {
 		unity_player Pl <- player_agents[id];
 		ask Pl.myland.trees {
@@ -50,7 +65,7 @@ species unity_linker parent: abstract_unity_linker {
 		}
 		ask Pl.myland.enemy_spawners {
 			do die;
-		}
+		} 
 		Pl.myland.started<-false;
 		Pl.myland.cntTime <- maxGameT;
 		Pl.myland.cntDem <- 0;

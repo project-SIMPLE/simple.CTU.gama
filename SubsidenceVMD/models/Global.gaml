@@ -20,6 +20,11 @@ global {
 
 	int maxGameT<-26;
 	
+	bool restart_game_in_case_of_deconnection;
+	bool let_gama_manage_time ;
+	
+	
+	
 	float pump_per_step <-  pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {
 		create GPlayLand number: 4  {

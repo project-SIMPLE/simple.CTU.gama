@@ -10,15 +10,17 @@ experiment session3 autorun: false type: unity {
 
 	//allow to hide the "map" display and to only display the displayVR display 
 	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
+	
+	parameter "restart_game_in_case_of_deconnection" var: restart_game_in_case_of_deconnection <- false among:[false];
+	parameter "let_gama_manage_time" var: let_gama_manage_time <- true among:[true];
 
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		ask unity_linker {
 			do create_player(id);
-		}
+		} 
 
 	}
-
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
 		if (not empty(unity_player)) {

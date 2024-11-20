@@ -40,4 +40,8 @@ global {
 	int update_subsidence_refresh_rate <- 7;
 
 	float enemy_generation_rate_visibility_threshold <- 0.01;
+	
+	
+	int duration_preparation <- 60; //in seconds;
+	int duration_defense<- 240; //in seconds;
 }
