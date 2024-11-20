@@ -28,13 +28,22 @@ species unity_linker parent: abstract_unity_linker {
 
 	list<point> init_locations <- [any_location_in(world) + {0,0,1}];
 	
-
-	reflex let_player_start when: not empty(unity_player where !each.ready_to_start){
-		do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
-		
-	}
 	
+	reflex let_player_start when: not empty(unity_player where !each.ready_to_start) {
+		if (not let_gama_manage_game) {
+			do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
+		} else {
+			do send_message(unity_player where !each.ready_to_start, ["startGame"::true, "time_prep"::duration_preparation,"time_def"::duration_defense ]);
+	
+		}
+		
+	} 
+	
+	
+	 
 	action new_connection(string id) {
+		
+		current_time_def <- gama.machine_time + (duration_defense + duration_preparation) * 1000.0;
 		if (id in player_agents.keys) {
 			if (not let_gama_manage_game) {
 				do restart(id);

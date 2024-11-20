@@ -20,7 +20,14 @@ global {
 
 	bool let_gama_manage_game ;
 	
-	
+	float current_time_def <- 0.0;
+	reflex end_sequence when: (let_gama_manage_game)  {
+		if (gama.machine_time >= current_time_def ) {
+			do pause;
+			current_time_def <- 0.0;
+		}
+		
+	}
 	
 	float pump_per_step <-  pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {

@@ -2,27 +2,6 @@ model Session2
 
 import "../CommonVR.gaml"
 
-global {
-
-//	reflex {
-//		if (flip(0.01)) {
-//			unity_player Pl <- any(unity_player);
-//			if (Pl.myland != nil) {
-//				create Pumper {
-//					_id <- "" + int(self);
-//					playerLand_ID <- Pl.myland.playerLand_ID;
-//					Pl.myland.pumpers["" + int(self)] <- self;
-//					location <- any_location_in(Pl.myland);
-//					my_cell <- cell(location);
-//				}
-//
-//			}
-//
-//		} 
-//
-//	}
-
-}
   
 experiment session2 autorun: true type: unity {
 //minimal time between two simulation step
@@ -38,11 +17,8 @@ experiment session2 autorun: true type: unity {
 
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
-		write "create_player: " + id;
 		
-		/*if (id in first(unity_linker).player_agents.keys) {
-			do remove_player(id);
-		}*/
+		
 		ask unity_linker {
 			do create_player(id);
 		}
@@ -51,7 +27,6 @@ experiment session2 autorun: true type: unity {
 
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
-		write "remove_plater: " + id_input;
 		if (not empty(unity_player)) {
 			ask unity_linker {
 				if (id_input in player_agents.keys) {
@@ -76,7 +51,7 @@ experiment session2 autorun: true type: unity {
 	point player_3_position <- {0.025, 0.525};
 	point player_4_position <- {0.525, 0.525};
 	output synchronized: true {
-		layout #split consoles: true parameters: true toolbars: true tabs: true controls: true;
+		layout #split consoles: false parameters: false toolbars: false tabs: false controls: false;
 		display "P1" type: 3d axes: false {
 			camera 'default' location: {182997.1146, 136750.0, 165319.368} target: {183000.0, 136750.0, 0.0};
 			graphics "image11" refresh: true {
