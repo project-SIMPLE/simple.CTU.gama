@@ -25,7 +25,7 @@ experiment session3 autorun: false type: unity {
 	}
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
-		if (not empty(unity_player)) {
+		if (not empty(unity_player)) { 
 			ask unity_linker {
 				if (id_input in player_agents.keys) {
 					do restart(id_input);

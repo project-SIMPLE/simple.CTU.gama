@@ -19,7 +19,7 @@ experiment session2 autorun: true type: unity {
 	action create_player (string id) {
 		
 		
-		ask unity_linker {
+		ask unity_linker { 
 			do create_player(id);
 		}
 		write sample(length(unity_player));

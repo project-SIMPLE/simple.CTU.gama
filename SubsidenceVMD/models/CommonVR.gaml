@@ -29,15 +29,6 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- [any_location_in(world) + {0,0,1}];
 	
 	
-	reflex let_player_start when: not empty(unity_player where !each.ready_to_start) {
-		if (not let_gama_manage_game) {
-			do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
-		} else {
-			do send_message(unity_player where !each.ready_to_start, ["startGame"::true, "time_prep"::duration_preparation,"time_def"::duration_defense ]);
-	
-		}
-		
-	} 
 	
 	
 	 
@@ -98,6 +89,37 @@ species unity_linker parent: abstract_unity_linker {
 	action player_ready(string idP) {
 		unity_player Pl <- player_agents[idP];
 		Pl.ready_to_start <- true;
+	}
+	
+	action player_finish_game(string idP) {
+		write "END FOR " + idP;
+		if (let_gama_manage_game) {
+			unity_player Pl <- player_agents[idP];
+			Pl.finish_game <- true;
+		}
+		
+	}
+	
+	reflex let_player_start when: not empty(unity_player where !each.ready_to_start) {
+		if (not let_gama_manage_game) {
+			do send_message(unity_player where !each.ready_to_start, ["readyToStart"::""]);
+		} else {
+			do send_message(unity_player where !each.ready_to_start, ["startGame"::true, "time_prep"::duration_preparation,"time_def"::duration_defense ]);
+	
+		}
+		
+	} 
+	
+	
+	reflex end_sequence when: (let_gama_manage_game) and empty(unity_player where not each.finish_game)  {
+		write "END OF GAME";
+		ask unity_player {
+			finish_game <- false;
+		} 
+		current_time_def <- 0.0;
+		ask world {
+			do pause;
+		}	
 	}
 	
 	reflex send_fresh_water_spawn_rate when: every(pumper_rate_refresh_rate#cycle) {
@@ -365,6 +387,8 @@ species unity_player parent: abstract_unity_player {
 	bool to_display <- false;
 	
 	bool ready_to_start <- false;
+	
+	bool finish_game <- false;
 	
 	string current_state;
 
