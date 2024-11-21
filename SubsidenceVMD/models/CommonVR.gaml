@@ -154,8 +154,9 @@ species unity_linker parent: abstract_unity_linker {
 		ask unity_player where not (dead(each) and each.ready_to_start){
 			
 			list<int> subsidence_values <- cell collect each.subsidence(myland.playerLand_ID);
+			float subsi_score<-(mean(cell collect each.subsidence(myland.playerLand_ID)) with_precision 2);
 			ask myself {
-				do send_message([myself], ["subsidences"::subsidence_values,"waterGlobal"::round(precision * sum(waters)/(length(GPlayLand) * sum_water_init)), "waterLocal"::round(precision * waters[myself.myland.playerLand_ID]/ sum_water_init)]);
+				do send_message([myself], ["subsidences"::subsidence_values,"subsi_score"::subsi_score,"waterGlobal"::round(precision * sum(waters)/(length(GPlayLand) * sum_water_init)), "waterLocal"::round(precision * waters[myself.myland.playerLand_ID]/ sum_water_init)]);
 			}
 		}
 	}
