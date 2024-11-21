@@ -2,7 +2,7 @@ model Session3
 
 import "../CommonVR.gaml"
 global{
-	
+	bool collaborating<-true;
 }
 experiment session3 autorun: false type: unity {
 //minimal time between two simulation step

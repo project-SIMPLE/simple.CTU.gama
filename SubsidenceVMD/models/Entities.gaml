@@ -62,6 +62,8 @@ species Pumper {
 }
 
 species GPlayLand {
+	GPlayLand upstream;
+	GPlayLand downstream;
 	int playerLand_ID;
 	map<string, Pumper> pumpers;
 	map<string, tree> trees;

@@ -44,4 +44,6 @@ global {
 	
 	int duration_preparation <- 60; //in seconds;
 	int duration_defense<- 240; //in seconds;
+	
+	bool collaborating<-false;
 }

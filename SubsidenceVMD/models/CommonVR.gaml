@@ -126,6 +126,13 @@ species unity_linker parent: abstract_unity_linker {
 		ask unity_player where not (dead(each) and each.ready_to_start) {
 			list<string> ids <- myland.pumpers collect each._id;
 			list<float> spawn_rate <-  myland.pumpers collect round(myself.precision * each.fresh_water_generation_rate);
+			if(collaborating){
+				if(myland.upstream!=nil){					
+					float helping_rate<-length(myland.upstream.pumpers)/10;
+					spawn_rate<-spawn_rate+helping_rate;
+				}
+			}
+			
 			ask myself {
 				do send_message([myself], ["pumpers"::ids, "spawnrates"::spawn_rate]);
 			}
@@ -137,6 +144,14 @@ species unity_linker parent: abstract_unity_linker {
 		ask unity_player where not (dead(each) and each.ready_to_start){
 			list<string> ids <- myland.enemy_spawners collect each._id;
 			list<float> spawn_rate <-  myland.enemy_spawners collect round(myself.precision * each.enemy_generation_rate);
+			if(collaborating){
+				if(myland.downstream!=nil){
+					spawn_rate<-spawn_rate-1;
+				}
+				if(myland.upstream!=nil){
+					spawn_rate<-spawn_rate+1;
+				}
+			}
 			ask myself {
 				do send_message([myself], ["enemyspawners"::ids, "spawnrates"::spawn_rate]);
 			}

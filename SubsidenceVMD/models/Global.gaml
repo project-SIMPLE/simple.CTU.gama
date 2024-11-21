@@ -33,5 +33,13 @@ global {
 				myself.my_team <- self; 
 			}  
 		}	
+		if(collaborating){
+			GPlayLand[0].downstream<-GPlayLand[2];
+			GPlayLand[1].downstream<-GPlayLand[3];
+			
+			GPlayLand[2].upstream<-GPlayLand[0];
+			GPlayLand[3].upstream<-GPlayLand[1];
+			
+		}
 	} 
 }
