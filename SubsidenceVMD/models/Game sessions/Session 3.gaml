@@ -2,7 +2,7 @@ model Session3
 
 import "../CommonVR.gaml"
 global{
-	bool collaborating<-true;
+	bool collaborating<-false;
 }
 experiment session3 autorun: false type: unity {
 //minimal time between two simulation step
@@ -55,7 +55,7 @@ experiment session3 autorun: false type: unity {
 			camera 'default' location: {182996.6598, 120195.8174, 191377.8334} target: {183000.0, 120195.8174, 0.0};
 			graphics "image11" refresh: true {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.001};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.01};
 			}
 
 			graphics "image12" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
@@ -63,7 +63,7 @@ experiment session3 autorun: false type: unity {
 				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {-20000, 100} color: #yellow;
 				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {-20000, 18000} color: #yellow;
 				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {-20000, 38000} color: #yellow;
-				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
+				draw "Sụt lún: " + ((mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID))) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
 				draw "Time: " + GPlayLand[nP].cntTime at: {-20000, 78000} font: font("Helvetica", 24, #bold) color: #yellow;
 				draw "P1 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {-20000, 98000} font: font("Helvetica", 24, #bold) color: #yellow;
 			}
@@ -84,7 +84,7 @@ experiment session3 autorun: false type: unity {
 			//			agents "P2 background" value: [GPlayLand[1]] size: {0.5, 0.5} position: {0.5, 0} refresh: false;
 			graphics "image21" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.001};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.01};
 			}
 
 			graphics "image22" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
@@ -112,7 +112,7 @@ experiment session3 autorun: false type: unity {
 			//			agents "P3 background" value: [GPlayLand[2]] size: {0.5, 0.5} position: {0.0, 0.5} refresh: false;
 			graphics "image31" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.001};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.01};
 			}
 
 			graphics "image32" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
@@ -140,7 +140,7 @@ experiment session3 autorun: false type: unity {
 			//			agents "P4 background" value: [GPlayLand[3]] size: {0.5, 0.5} position: {0.5, 0.5} refresh: false;
 			graphics "image41" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.001};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.01};
 			}
 
 			graphics "image42" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {

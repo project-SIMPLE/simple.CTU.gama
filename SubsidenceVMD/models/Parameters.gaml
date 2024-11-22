@@ -23,7 +23,7 @@ global {
 	
 
 	grid_file ground_water_level_grid <- grid_file("../includes/groundwater/groundwaterLevel.tif");
-	float refill_rate <- 0.01;
+	float refill_rate <- 0.001;
 	
 	// para of Pumper 
 	float pumVolumeHour <- 5.0; //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months
@@ -36,14 +36,14 @@ global {
 	list<rgb> color_lands <- [#yellow, #lightgreen, #violet, #red];
 	
 	int pumper_rate_refresh_rate <- 10; // in number of cycles
-	int enemy_genetation_rate_refresh_rate <- 10; // in number of cycles
+	int enemy_genetation_rate_refresh_rate <- 100; // in number of cycles
 	int update_subsidence_refresh_rate <- 7;
 
 	float enemy_generation_rate_visibility_threshold <- 0.01;
 	
 	
-	int duration_preparation <- 60; //in seconds;
+	int duration_preparation <- 1; //in seconds;
 	int duration_defense<- 240; //in seconds;
 	
-	bool collaborating<-false;
+	bool collaborating<-true;
 }

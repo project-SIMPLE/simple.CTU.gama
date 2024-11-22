@@ -25,7 +25,7 @@ global {
 	
 	
 	
-	float pump_per_step <-  pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
+	float pump_per_step <-  0.5;//pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {
 		create GPlayLand number: 4  {
 			playerLand_ID <- int(self); 

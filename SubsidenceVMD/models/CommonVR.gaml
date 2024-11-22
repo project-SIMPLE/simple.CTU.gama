@@ -143,7 +143,7 @@ species unity_linker parent: abstract_unity_linker {
 	reflex send_enemy_spawn_rate when: every(enemy_genetation_rate_refresh_rate#cycle) {
 		ask unity_player where not (dead(each) and each.ready_to_start){
 			list<string> ids <- myland.enemy_spawners collect each._id;
-			list<float> spawn_rate <-  myland.enemy_spawners collect round(myself.precision * each.enemy_generation_rate);
+			list<float> spawn_rate <-  myland.enemy_spawners collect round(myself.precision *each.enemy_generation_rate);
 			if(collaborating){
 				if(myland.downstream!=nil){
 					spawn_rate<-spawn_rate-1;
@@ -152,6 +152,7 @@ species unity_linker parent: abstract_unity_linker {
 					spawn_rate<-spawn_rate+1;
 				}
 			}
+			write spawn_rate;
 			ask myself {
 				do send_message([myself], ["enemyspawners"::ids, "spawnrates"::spawn_rate]);
 			}
@@ -171,7 +172,7 @@ species unity_linker parent: abstract_unity_linker {
 			list<int> subsidence_values <- cell collect each.subsidence(myland.playerLand_ID);
 			float subsi_score<-(mean(cell collect each.subsidence(myland.playerLand_ID)) with_precision 2);
 			ask myself {
-				do send_message([myself], ["subsidences"::subsidence_values,"subsi_score"::subsi_score,"waterGlobal"::round(precision * sum(waters)/(length(GPlayLand) * sum_water_init)), "waterLocal"::round(precision * waters[myself.myland.playerLand_ID]/ sum_water_init)]);
+				do send_message([myself], ["subsidences"::subsidence_values,"subsi_score"::subsi_score,"waterGlobal"::round(precision * sum(waters)/(length(GPlayLand) * sum_water_init)), "waterLocal"::round(precision *100* waters[myself.myland.playerLand_ID]/ sum_water_init)]);
 			}
 		}
 	}
