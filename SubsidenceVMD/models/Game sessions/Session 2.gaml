@@ -15,6 +15,7 @@ experiment session2 autorun: true type: unity {
 
 	parameter "let_gama_manage_time" var: let_gama_manage_game <- false among:[false];
 
+	parameter collaborating var:collaborating <- false among:[false];
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		

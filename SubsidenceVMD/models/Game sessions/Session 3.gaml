@@ -1,9 +1,7 @@
 model Session3
 
 import "../CommonVR.gaml"
-global{
-	bool collaborating<-false;
-}
+
 experiment session3 autorun: false type: unity {
 //minimal time between two simulation step
 	float minimum_cycle_duration <- 0.01;
@@ -16,6 +14,8 @@ experiment session3 autorun: false type: unity {
 	
 	parameter "let_gama_manage_time" var: let_gama_manage_game <- true among:[true];
 
+	parameter collaborating var:collaborating <- true among:[true];
+	
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		ask unity_linker {
@@ -99,7 +99,7 @@ experiment session3 autorun: false type: unity {
 
 			agents "P2 Tree" value: GPlayLand[1].trees.values;
 			agents "P2 warning" value: GPlayLand[1].enemy_spawners.values;
-			agents "P2 Pumper" value: GPlayLand[1].pumpers.values;
+			agents "P2 Pumper" value: GPlayLand[1].pumpers.values; 
 			agents "P2 enemy" value: GPlayLand[1].enemies.values;
 			agents "P2 fresh water" value: GPlayLand[1].fresh_waters.values;
 			agents "P2" value: unity_player where (each.myland = GPlayLand[1]) transparency: 0.5;

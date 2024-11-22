@@ -23,7 +23,7 @@ global {
 	float current_time_def <- 0.0;
 	
 	
-	
+	bool collaborating<-false;
 	
 	float pump_per_step <-  0.5;//pumVolumeHour * pumHourperDay * pumDayperMonth * pumMonthperYear / pixelSize; 
 	init {
