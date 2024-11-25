@@ -43,7 +43,8 @@ species Pumper {
 	float fresh_water_generation_rate;
 
 	aspect default {
-		draw cube(8000) color: #magenta; //texture: ipumper;
+		draw circle(8000)  depth:100 color: #magenta; //texture: ipumper;
+		draw ""+(int(self)+1) size:100000 at:location+{-2000,-2000,150} rotate:90::{0,0,1} color:#yellow;
 	}
 
 	reflex extract_water {
@@ -73,6 +74,7 @@ species GPlayLand {
 	map<string, enemy_spawner> enemy_spawners;
 	bool subside <- false;
 	int cntDem <- 0;
+	int numberWater <- 0;
 	int numberPumper <- 1;
 	int numberLake <- 1;
 	int numberSluice <- 1;
@@ -82,7 +84,7 @@ species GPlayLand {
 	bool finished <- false;
 	team my_team;
 	int remaining_time <- 18000;
-	int current_score;
+	float current_score;
 	int rot <- 0;
 	int cntTime;
 
@@ -122,7 +124,7 @@ species enemy_spawner {
 
 	reflex update_enemy_generation_rate {
 		subsidence_area <- my_cells mean_of (each.subsidence(playerLand_ID));
-		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area);
+		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area*2);
 	}
 
 	aspect default {

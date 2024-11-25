@@ -70,6 +70,8 @@ species unity_linker parent: abstract_unity_linker {
 		Pl.myland.cntDem <- 0;
 		Pl.myland.subside <- false;
 	    Pl.myland.deadtrees<-0;
+	    Pl.myland.numberWater<-0;
+	    Pl.myland.current_score<-0.0;
 		Pl.myland.pumpers <- [];
 		Pl.myland.trees <- [];
 		Pl.myland.fresh_waters <- [];
@@ -187,12 +189,15 @@ species unity_linker parent: abstract_unity_linker {
 //		return {y/precision * ya + yb,x/precision * xa + xb };
 	}
 	
-	action update_player_pos(string idP,  int x, int y, int o, int remaining_time) {
+	action update_player_pos(string idP,  int x, int y, int o, int remaining_time, int dtree, float score) {
 		unity_player Pl <- player_agents[idP];
 		Pl.location <-  toGAMACoordinate(x,y);
 		Pl.heading <- float(o/precision)+90;
 		Pl.to_display <- true;
 		Pl.myland.cntTime <- max(0,remaining_time);
+		Pl.myland.deadtrees <-  (dtree);
+//		write dtree;
+		Pl.myland.current_score <- max(0,score);
 	}
 
 	action create_trees(string idP, string idTsStr, string xsStr, string ysStr) {
@@ -229,7 +234,7 @@ species unity_linker parent: abstract_unity_linker {
 		tree t <- Pl.myland.trees[idT];
 		if (t != nil ){
 				remove key: idT from: Pl.myland.trees ;				
-				Pl.myland.deadtrees<-Pl.myland.deadtrees+1;
+//				Pl.myland.deadtrees<-Pl.myland.deadtrees+1;
 				
 			ask t { 
 				do die;
@@ -370,6 +375,7 @@ species unity_linker parent: abstract_unity_linker {
 						_id <- idfw;
 						playerLand_ID <- Pl.myland.playerLand_ID;
 						Pl.myland.fresh_waters[idfw] <- self;
+						Pl.myland.numberWater<-Pl.myland.numberWater+1;
 						location <- pt; 
 					}
 				}
@@ -436,6 +442,8 @@ species unity_player parent: abstract_unity_player {
 		myland.cntDem <- 0;
 		myland.subside <- false;
 		myland.deadtrees<-0;
+	    myland.numberWater<-0;
+	    myland.current_score<-0.0;
 		
 		myland.started<-false;
 
