@@ -103,7 +103,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //78000
 				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //98000
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
 				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
@@ -140,7 +140,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //78000
 				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //98000
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
 				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
@@ -177,7 +177,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //78000
 				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //98000
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
 				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
