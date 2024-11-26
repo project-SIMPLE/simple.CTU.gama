@@ -34,11 +34,20 @@ global {
 			}  
 		}	
 		if(collaborating){
-			GPlayLand[0].downstream<-GPlayLand[2];
-			GPlayLand[1].downstream<-GPlayLand[3];
+//			GPlayLand[0].downstream<-GPlayLand[2];
+//			GPlayLand[1].downstream<-GPlayLand[3];
+//			
+//			GPlayLand[2].upstream<-GPlayLand[0];
+//			GPlayLand[3].upstream<-GPlayLand[1];
+
+
+			GPlayLand[0].downstream<-GPlayLand[1];
+			GPlayLand[2].downstream<-GPlayLand[3];
 			
-			GPlayLand[2].upstream<-GPlayLand[0];
-			GPlayLand[3].upstream<-GPlayLand[1];
+			GPlayLand[1].upstream<-GPlayLand[0];
+			GPlayLand[3].upstream<-GPlayLand[2];
+			
+			refill_rates <- [0.001,0.0001,0.001,0.0001];
 			
 		}
 	} 

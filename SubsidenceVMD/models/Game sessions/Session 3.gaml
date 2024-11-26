@@ -1,7 +1,6 @@
 model Session3
 
 import "../CommonVR.gaml"
-
 experiment session3 autorun: false type: unity {
 //minimal time between two simulation step
 	float minimum_cycle_duration <- 0.01;
@@ -11,30 +10,29 @@ experiment session3 autorun: false type: unity {
 
 	//allow to hide the "map" display and to only display the displayVR display 
 	list<string> displays_to_hide <- ["Digital Elevation Model", "W1", "Subsidence - Groundwater extracted"];
-	
-	parameter "let_gama_manage_time" var: let_gama_manage_game <- true among:[true];
+	parameter "let_gama_manage_time" var: let_gama_manage_game <- true among: [true];
+	parameter collaborating var: collaborating <- true among: [true];
 
-	parameter collaborating var:collaborating <- true among:[true];
-	
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		ask unity_linker {
 			do create_player(id);
-		} 
+		}
 
 	}
 	//action called by the middleware when a plyer is remove from the simulation
 	action remove_player (string id_input) {
-		if (not empty(unity_player)) { 
+		if (not empty(unity_player)) {
 			ask unity_linker {
 				if (id_input in player_agents.keys) {
 					do restart(id_input);
 					ask unity_player(player_agents[id_input]) {
-						do die;	
+						do die;
 					}
-					remove key:id_input from: player_agents ;
+
+					remove key: id_input from: player_agents;
 				}
-				
+
 			}
 
 		}
@@ -55,17 +53,27 @@ experiment session3 autorun: false type: unity {
 			camera 'default' location: {182996.6598, 120195.8174, 191377.8334} target: {183000.0, 120195.8174, 0.0};
 			graphics "image11" refresh: true {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.01};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at: location + {0, 0, 0.01};
 			}
 
 			graphics "image12" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
 				int nP <- 0;
-				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {-20000, 100} color: #yellow;
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {-20000, 18000} color: #yellow;
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {-20000, 38000} color: #yellow;
-				draw "Sụt lún: " + ((mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID))) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "Time: " + GPlayLand[nP].cntTime at: {-20000, 78000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "P1 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {-20000, 98000} font: font("Helvetica", 24, #bold) color: #yellow;
+				int xx <- -20000;
+				int yy <- 0;
+				draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
+				draw "P1 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000;
+				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //78000
+				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //98000
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //38000
+				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Score: " + ((GPlayLand[nP].current_score) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 			}
 
 			agents "P1 Tree" value: GPlayLand[0].trees.values;
@@ -84,22 +92,32 @@ experiment session3 autorun: false type: unity {
 			//			agents "P2 background" value: [GPlayLand[1]] size: {0.5, 0.5} position: {0.5, 0} refresh: false;
 			graphics "image21" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.01};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at: location + {0, 0, 0.01};
 			}
 
 			graphics "image22" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
 				int nP <- 1;
-				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {-20000, 100} color: #yellow;
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {-20000, 18000} color: #yellow;
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {-20000, 38000} color: #yellow;
-				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "Time: " + GPlayLand[nP].cntTime at: {-20000, 78000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "P2 " + (length(unity_player) > 1 ? (unity_player[nP].name) : "") at: {-20000, 98000} font: font("Helvetica", 24, #bold) color: #yellow;
+				int xx <- -20000;
+				int yy <- 0;
+				draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
+				draw "P2 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000;
+				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //78000
+				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //98000
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //38000
+				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Score: " + ((GPlayLand[nP].current_score) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 			}
 
 			agents "P2 Tree" value: GPlayLand[1].trees.values;
 			agents "P2 warning" value: GPlayLand[1].enemy_spawners.values;
-			agents "P2 Pumper" value: GPlayLand[1].pumpers.values; 
+			agents "P2 Pumper" value: GPlayLand[1].pumpers.values;
 			agents "P2 enemy" value: GPlayLand[1].enemies.values;
 			agents "P2 fresh water" value: GPlayLand[1].fresh_waters.values;
 			agents "P2" value: unity_player where (each.myland = GPlayLand[1]) transparency: 0.5;
@@ -112,17 +130,27 @@ experiment session3 autorun: false type: unity {
 			//			agents "P3 background" value: [GPlayLand[2]] size: {0.5, 0.5} position: {0.0, 0.5} refresh: false;
 			graphics "image31" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at:location+{0,0,0.01};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #violet at: location + {0, 0, 0.01};
 			}
 
 			graphics "image32" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
 				int nP <- 2;
-				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {-20000, 100} color: #yellow;
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {-20000, 18000} color: #yellow;
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {-20000, 38000} color: #yellow;
-				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "Time: " + GPlayLand[nP].cntTime at: {-20000, 78000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "P3 " + (length(unity_player) > 2 ? (unity_player[nP].name) : "") at: {-20000, 98000} font: font("Helvetica", 24, #bold) color: #yellow;
+				int xx <- -20000;
+				int yy <- 0;
+				draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
+				draw "P3 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000;
+				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //78000
+				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //98000
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //38000
+				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Score: " + ((GPlayLand[nP].current_score) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 			}
 
 			agents "P3 Tree" value: GPlayLand[2].trees.values;
@@ -140,17 +168,27 @@ experiment session3 autorun: false type: unity {
 			//			agents "P4 background" value: [GPlayLand[3]] size: {0.5, 0.5} position: {0.5, 0.5} refresh: false;
 			graphics "image41" refresh: false {
 				draw rectangle(world.shape.height * 1177 / 1421, world.shape.height) texture: image_file("../includes/scene.png");
-				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at:location+{0,0,0.01};
+				draw rectangle(1.5e5, 2.8e5).contour + 5e3 color: #cyan at: location + {0, 0, 0.01};
 			}
 
 			graphics "image42" refresh: true rotate: -90 size: {0.45, 0.45} position: {9e4, 6e4, 0.01} {
 				int nP <- 3;
-				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {-20000, 100} color: #yellow;
-				draw "Nước sạch: " + (length(GPlayLand[nP].fresh_waters.values)) font: font("Helvetica", 24, #bold) at: {-20000, 18000} color: #yellow;
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {-20000, 38000} color: #yellow;
-				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {-20000, 58000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "Time: " + GPlayLand[nP].cntTime at: {-20000, 78000} font: font("Helvetica", 24, #bold) color: #yellow;
-				draw "P4 " + (length(unity_player) > 3 ? (unity_player[nP].name) : "") at: {-20000, 98000} font: font("Helvetica", 24, #bold) color: #yellow;
+				int xx <- -20000;
+				int yy <- 0;
+				draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
+				draw "P4 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000;
+				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //78000
+				draw "Cây chết: " + ((GPlayLand[nP].deadtrees)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //98000
+				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //38000
+				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
+				yy <- yy + 18000; //58000
+				draw "Score: " + ((GPlayLand[nP].current_score) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 			}
 
 			agents "P4 Tree" value: GPlayLand[3].trees.values;

@@ -24,6 +24,7 @@ global {
 
 	grid_file ground_water_level_grid <- grid_file("../includes/groundwater/groundwaterLevel.tif");
 	float refill_rate <- 0.001;
+	list<float> refill_rates <- [0.001,0.001,0.001,0.001];
 	
 	// para of Pumper 
 	float pumVolumeHour <- 5.0; //2,4 - 6 m3/h // alow <  10m3/day--> 10 * 30day*3months

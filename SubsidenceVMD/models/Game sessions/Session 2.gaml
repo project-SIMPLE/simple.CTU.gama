@@ -68,7 +68,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //98000
 				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Máy bơm: " + ((GPlayLand[nP].numberPumper)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
 				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 				yy <- yy + 18000; //58000
@@ -105,7 +105,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //98000
 				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Máy bơm: " + ((GPlayLand[nP].numberPumper)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
 				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 				yy <- yy + 18000; //58000
@@ -142,7 +142,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //98000
 				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Máy bơm: " + ((GPlayLand[nP].numberPumper)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
 				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 				yy <- yy + 18000; //58000
@@ -179,7 +179,7 @@ experiment session2 autorun: true type: unity {
 				yy <- yy + 18000; //98000
 				draw "Nước sạch: " + ((GPlayLand[nP].numberWater)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //38000
-				draw "Máy bơm: " + (length(GPlayLand[nP].pumpers.values)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
+				draw "Máy bơm: " + ((GPlayLand[nP].numberPumper)) font: font("Helvetica", 24, #bold) at: {xx, yy} color: #yellow;
 				yy <- yy + 18000; //58000
 				draw "Sụt lún: " + (mean(cell collect each.subsidence(GPlayLand[nP].playerLand_ID)) with_precision 2) at: {xx, yy} font: font("Helvetica", 24, #bold) color: #yellow;
 				yy <- yy + 18000; //58000

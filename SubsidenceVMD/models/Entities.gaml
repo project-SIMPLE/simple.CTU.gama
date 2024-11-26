@@ -29,7 +29,7 @@ grid cell file: ground_water_level_grid {
 
 	reflex refill_water {
 		loop i from: 0 to: 3 {
-			water_level[i] <- min(grid_value, grid_value * refill_rate + water_level[i]);
+			water_level[i] <- min(grid_value, grid_value * refill_rates[i] + water_level[i]);
 		}
 
 	}
@@ -41,9 +41,9 @@ species Pumper {
 	string _id;
 	cell my_cell;
 	float fresh_water_generation_rate;
-
+	bool broken<-false;
 	aspect default {
-		draw circle(8000)  depth:100 color: #magenta; //texture: ipumper;
+		draw circle(8000)  depth:100 color: broken?#grey:#magenta; //texture: ipumper;
 		draw ""+(int(self)+1) size:100000 at:location+{-2000,-2000,150} rotate:90::{0,0,1} color:#yellow;
 	}
 
@@ -124,7 +124,7 @@ species enemy_spawner {
 
 	reflex update_enemy_generation_rate {
 		subsidence_area <- my_cells mean_of (each.subsidence(playerLand_ID));
-		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area*2);
+		enemy_generation_rate <- reference_fresh_water_generation_time * (0.5 + subsidence_area);
 	}
 
 	aspect default {
