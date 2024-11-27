@@ -198,13 +198,14 @@ species unity_linker parent: abstract_unity_linker {
 		//		return {y/precision * ya + yb,x/precision * xa + xb };
 	}
 
-	action update_player_pos (string idP, int x, int y, int o, int remaining_time, int dtree, float score) {
+	action update_player_pos (string idP, int x, int y, int o, int remaining_time, int dtree,int fwater, float score) {
 		unity_player Pl <- player_agents[idP];
 		Pl.location <- toGAMACoordinate(x, y);
 		Pl.heading <- float(o / precision) + 90;
 		Pl.to_display <- true;
 		Pl.myland.cntTime <- max(0, remaining_time);
 		Pl.myland.deadtrees <- (dtree);
+		Pl.myland.numberWater <- (fwater);
 		//		write dtree;
 		Pl.myland.current_score <- max(0, score);
 	}
@@ -392,7 +393,7 @@ species unity_linker parent: abstract_unity_linker {
 						_id <- idfw;
 						playerLand_ID <- Pl.myland.playerLand_ID;
 						Pl.myland.fresh_waters[idfw] <- self;
-						Pl.myland.numberWater <- Pl.myland.numberWater + 1;
+//						Pl.myland.numberWater <- Pl.myland.numberWater + 1;
 						location <- pt;
 					}
 
