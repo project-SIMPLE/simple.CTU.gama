@@ -29,9 +29,10 @@ global {
 	init {
 		create GPlayLand number: 4  {
 			playerLand_ID <- int(self); 
-			create team with: [color::color_lands[int(self)]] {
-				myself.my_team <- self; 
-			}  
+			color<-color_lands[int(self)];
+//			create team with: [color::color_lands[int(self)]] {
+//				myself.my_team <- self; 
+//			}  
 		}	
 		if(collaborating){
 //			GPlayLand[0].downstream<-GPlayLand[2];

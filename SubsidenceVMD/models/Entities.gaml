@@ -66,6 +66,7 @@ species GPlayLand {
 	GPlayLand upstream;
 	GPlayLand downstream;
 	int playerLand_ID;
+	string rootPID<-"";
 	map<string, Pumper> pumpers;
 	map<string, tree> trees;
 	int deadtrees <- 0;
@@ -82,15 +83,16 @@ species GPlayLand {
 	//has the player finished ? 
 	bool started <- false;
 	bool finished <- false;
-	team my_team;
+	rgb color;
+//	team my_team;
 	int remaining_time <- 18000;
 	float current_score;
 	int rot <- 0;
 	int cntTime;
 
-	aspect default {
-		draw world.shape color: my_team.color;
-	}
+//	aspect default {
+//		draw world.shape color: my_team.color;
+//	}
 
 }
 

@@ -158,7 +158,7 @@ species unity_linker parent: abstract_unity_linker {
 
 			}
 
-			write spawn_rate;
+//			write spawn_rate;
 			ask myself {
 				do send_message([myself], ["enemyspawners"::ids, "spawnrates"::spawn_rate]);
 			}
@@ -200,10 +200,11 @@ species unity_linker parent: abstract_unity_linker {
 
 	action update_player_pos (string idP, int x, int y, int o, int remaining_time, int dtree,int fwater, float score) {
 		unity_player Pl <- player_agents[idP];
+//		write Pl; 
 		Pl.location <- toGAMACoordinate(x, y);
 		Pl.heading <- float(o / precision) + 90;
 		Pl.to_display <- true;
-		Pl.myland.cntTime <- max(0, remaining_time);
+		Pl.myland.cntTime <- max(0 , remaining_time);
 		Pl.myland.deadtrees <- (dtree);
 		Pl.myland.numberWater <- (fwater);
 		//		write dtree;
@@ -337,7 +338,7 @@ species unity_linker parent: abstract_unity_linker {
 		list<int> xs <- (xsStr split_with (",")) collect (int(each));
 		list<int> ys <- (ysStr split_with (",")) collect (int(each));
 		unity_player Pl <- player_agents[idP];
-		list<enemy> to_remove <- copy(Pl.myland.enemies.values);
+		list<enemy> to_remove <- Pl.myland.enemies!=nil?copy(Pl.myland.enemies.values):[];
 		if (length(sws) > 1) {
 			loop i from: 0 to: length(xs) - 1 {
 				string idsw <- sws[i];
@@ -436,8 +437,9 @@ species unity_player parent: abstract_unity_player {
 	string current_state;
 
 	init {
-		myland <- GPlayLand[length(unity_player) - 1];
-		color <- myland.my_team.color;
+		myland <- first(GPlayLand where (each.rootPID=name));
+
+		color <- myland.color;
 		do Restart(myland.playerLand_ID);
 	}
 
@@ -463,7 +465,7 @@ species unity_player parent: abstract_unity_player {
 		myland.deadtrees <- 0;
 		myland.numberWater <- 0;
 		myland.numberPumper<-0;
-		myland.current_score <- 0.0;
+		myland.current_score <- 0.0; 
 		myland.started <- false;
 	}
 

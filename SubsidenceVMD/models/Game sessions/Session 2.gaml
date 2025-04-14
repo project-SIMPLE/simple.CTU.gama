@@ -15,10 +15,11 @@ experiment session2 autorun: true type: unity {
 	//action called by the middleware when a player connects to the simulation
 	action create_player (string id) {
 		ask unity_linker {
+			any(GPlayLand where(each.rootPID="")).rootPID<-id;
 			do create_player(id);
 		}
 
-		write sample(length(unity_player));
+//		write ((unity_player));
 	}
 
 	//action called by the middleware when a plyer is remove from the simulation
@@ -28,6 +29,7 @@ experiment session2 autorun: true type: unity {
 				if (id_input in player_agents.keys) {
 					do restart(id_input);
 					ask unity_player(player_agents[id_input]) {
+						myland.rootPID<-"";
 						do die;
 					}
 
@@ -40,13 +42,13 @@ experiment session2 autorun: true type: unity {
 
 	}
 
-	point player_size <- {0.45, 0.45};
-	point p_size <- {0.75, 0.75};
-	point player_1_position <- {0.025, 0.025};
-	point p1_position <- {-1e2, 2e4};
-	point player_2_position <- {0.525, 0.025};
-	point player_3_position <- {0.025, 0.525};
-	point player_4_position <- {0.525, 0.525};
+//	point player_size <- {0.45, 0.45};
+//	point p_size <- {0.75, 0.75};
+//	point player_1_position <- {0.025, 0.025};
+//	point p1_position <- {-1e2, 2e4};
+//	point player_2_position <- {0.525, 0.025};
+//	point player_3_position <- {0.025, 0.525};
+//	point player_4_position <- {0.525, 0.525};
 	font f <- font("Helvetica", 16, #bold);
 	rgb c <- #white;
 	
