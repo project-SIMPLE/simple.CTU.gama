@@ -65,7 +65,7 @@ experiment session2 autorun: true type: unity {
 				int xx <- -70000;
 				int yy <- 0;
 				//draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
-				draw "P1 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: f color: c;
+				draw "P1 " + GPlayLand[nP].rootPID at: {xx, yy} font: f color: c;
 				yy <- yy + 18000;
 				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: f color: c;
 				yy <- yy + 18000; //78000
@@ -102,7 +102,7 @@ experiment session2 autorun: true type: unity {
 				int xx <- -70000;
 				int yy <- 0;
 				//draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
-				draw "P2 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: f color: c;
+				draw "P2 " + GPlayLand[nP].rootPID at: {xx, yy} font: f color: c;
 				yy <- yy + 18000;
 				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: f color: c;
 				yy <- yy + 18000; //78000
@@ -139,7 +139,7 @@ experiment session2 autorun: true type: unity {
 				int xx <- -70000;
 				int yy <- 0;
 				//draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
-				draw "P3 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: f color: c;
+				draw "P3 " + GPlayLand[nP].rootPID at: {xx, yy} font: f color: c;
 				yy <- yy + 18000;
 				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: f color: c;
 				yy <- yy + 18000; //78000
@@ -176,7 +176,7 @@ experiment session2 autorun: true type: unity {
 				int xx <- -70000;
 				int yy <- 0;
 				//draw rectangle(yy + (18000 * 6), yy + (18000 * 8)) color: #grey at: {(yy + (18000 * 8) / 5), (yy + (18000 * 8)) / 3};
-				draw "P4 " + (length(unity_player) > 0 ? (unity_player[nP].name) : "") at: {xx, yy} font: f color: c;
+				draw "P4 " + GPlayLand[nP].rootPID at: {xx, yy} font: f color: c;
 				yy <- yy + 18000;
 				draw "Time: " + GPlayLand[nP].cntTime at: {xx, yy} font: f color: c;
 				yy <- yy + 18000; //78000
